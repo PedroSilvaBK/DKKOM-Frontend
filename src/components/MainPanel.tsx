@@ -6,11 +6,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import { motion } from 'framer-motion'
 import CaveInviteMenu from './CaveInviteMenu';
 import CaveCreateChannelMenu from './CaveCreateChannelMenu';
+import CaveConfig from './CaveConfig';
 
 function MainPanel() {
     const [caveMenuOpen, setCaveMenuOpen] = useState<boolean>(false);
     const [createInviteMenuOpen, setCreateInviteMenuOpen] = useState<boolean>(false);
     const [createChannelMenuOpen, setCreateChannelMenuOpen] = useState<boolean>(false);
+    const [caveConfigMenuOpen, setCaveConfigMenuOpen] = useState<boolean>(false);
 
     const toggleCaveMenuOpen = () => {
         setCaveMenuOpen(!caveMenuOpen);
@@ -23,6 +25,10 @@ function MainPanel() {
 
     const toggleCreateChannelMenuOpen = () => {
         setCreateChannelMenuOpen(!createChannelMenuOpen);
+    }
+
+    const toggleCaveConfigMenuOpen = () => {
+        setCaveConfigMenuOpen(!caveConfigMenuOpen);
     }
 
     return (
@@ -46,7 +52,11 @@ function MainPanel() {
                     transition={{ duration: 0.1 }}
                     className='absolute w-full z-30 p-2'>
                     {
-                        caveMenuOpen && <CaveMenu toggleCreateInviteMenuOpen={toggleCreateInviteMenuOpen} toggleCreateChannelMenuOpen={toggleCreateChannelMenuOpen} />
+                        caveMenuOpen && <CaveMenu 
+                        toggleCreateInviteMenuOpen={toggleCreateInviteMenuOpen} 
+                        toggleCreateChannelMenuOpen={toggleCreateChannelMenuOpen} 
+                        toggleCaveConfigMenuOpen={toggleCaveConfigMenuOpen}
+                        />
                     }
                 </motion.div>
             </div>
@@ -79,6 +89,21 @@ function MainPanel() {
                         transition={{ duration: 0.1 }}
                     >
                         <CaveCreateChannelMenu toggleCreateChannelMenuOpen={toggleCreateChannelMenuOpen} />
+                    </motion.div>
+                )
+            }
+            {
+                caveConfigMenuOpen && (
+                    <motion.div
+                        variants={{
+                            open: { opacity: 1, display: 'initial' },
+                            closed: { opacity: 0, display: 'none' }
+                        }}
+                        initial='closed'
+                        animate={caveConfigMenuOpen ? 'open' : 'closed'}
+                        transition={{ duration: 0.1 }}
+                    >
+                        <CaveConfig toggleCaveConfigMenuOpen={toggleCaveConfigMenuOpen} />
                     </motion.div>
                 )
             }

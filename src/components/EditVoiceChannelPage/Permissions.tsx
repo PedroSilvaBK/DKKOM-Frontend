@@ -59,7 +59,7 @@ function Permissions() {
                         </div>
                     </motion.div>
                 </div>
-                <div className='flex flex-col gap-3'>
+                <div className='flex flex-col gap-3 h-[35rem] overflow-y-scroll'>
                     <h2 className='text-secondary-100 text-sm font-semibold'>Channel Permissions</h2>
                     <PermissionList />
                 </div>
