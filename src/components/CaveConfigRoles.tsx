@@ -2,7 +2,6 @@ import { IconButton } from '@mui/material'
 import React from 'react'
 import AddIcon from '@mui/icons-material/Add';
 import { motion, useAnimation } from 'framer-motion'
-import IOSSwitch from './IOSSwitch';
 import CaveConfigRolesPermission from './CaveConfigRolesPermission';
 
 
@@ -42,7 +41,7 @@ function CaveConfigRoles() {
                         </div>
                     </div>
                 </div>
-                <div className='flex flex-col gap-4 h-[30rem] overflow-y-scroll'>
+                <div className='flex flex-col gap-4 h-[35rem] overflow-y-scroll'>
                     {
                         Array.from({ length: 5 }).map((_, index) => (
                             <>

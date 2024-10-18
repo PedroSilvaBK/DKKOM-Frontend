@@ -1,9 +1,9 @@
 import { Route, Routes } from 'react-router'
 import './App.css'
 import LogIn from './pages/LogIn'
-import Register from './pages/Register'
 import { BrowserRouter } from 'react-router-dom'
-import Index from './pages'
+import Index from './pages/Index'
+import AuthCallback from './pages/AuthCallback'
 
 function App() {
   return (
@@ -12,7 +12,7 @@ function App() {
         <Routes>
           <Route path='/' element={<Index />} />
           <Route path='/login' element={<LogIn />} />
-          <Route path='/register' element={<Register />} />
+          <Route path='/auth/callback' element={<AuthCallback />} />
         </Routes>
       </BrowserRouter>
     </div>
