@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom'
 import google_logo from '../assets/google_logo.png'
 
 function LogIn() {
-    const navigate = useNavigate()
     const animationControls: AnimationControls = useAnimation()
 
     useEffect(() => {

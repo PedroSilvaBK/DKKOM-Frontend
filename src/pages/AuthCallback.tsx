@@ -1,8 +1,11 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../components/AuthProvider';
 
 function AuthCallback() {
     const navigate = useNavigate();
+    const {login} = useAuth();
+
     useEffect(() => {
         const cookies = document.cookie.split(';');
 
@@ -17,7 +20,9 @@ function AuthCallback() {
                 const cookieName = cookie.split('=')[0].trim();
                 document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
             });
-            
+
+            login(token);
+
             navigate('/');
         }
     }, []);
