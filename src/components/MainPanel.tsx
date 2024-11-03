@@ -7,12 +7,19 @@ import { motion } from 'framer-motion'
 import CaveInviteMenu from './CaveInviteMenu';
 import CaveCreateChannelMenu from './CaveCreateChannelMenu';
 import CaveConfig from './CaveConfig';
+import { ChannelOverviewDTO, CreateCaveInviteRequest } from '../api/CaveServiceApi';
+import ChannelServiceApi, { ChannelType, CreateChannelRequest, CreateChannelResponse } from '../api/ChannelService';
+import { useCave } from './CaveProvider';
+import  caveServiceApi from '../api/CaveServiceApi';
 
 function MainPanel() {
     const [caveMenuOpen, setCaveMenuOpen] = useState<boolean>(false);
     const [createInviteMenuOpen, setCreateInviteMenuOpen] = useState<boolean>(false);
     const [createChannelMenuOpen, setCreateChannelMenuOpen] = useState<boolean>(false);
     const [caveConfigMenuOpen, setCaveConfigMenuOpen] = useState<boolean>(false);
+
+    const {selectedCaveBaseInfo, setSelectedCaveBaseInfo} = useCave();
+
 
     const toggleCaveMenuOpen = () => {
         setCaveMenuOpen(!caveMenuOpen);
@@ -31,13 +38,63 @@ function MainPanel() {
         setCaveConfigMenuOpen(!caveConfigMenuOpen);
     }
 
+    const updateChannelListAfterCreate = (createChannelResponse: CreateChannelResponse) => {
+        if (createChannelResponse.type === ChannelType.TEXT_CHANNEL) {
+            const channelDto: ChannelOverviewDTO = {
+                id: createChannelResponse.id,
+                name: createChannelResponse.name,
+            }
+
+            if (selectedCaveBaseInfo) {
+                setSelectedCaveBaseInfo({
+                    ...selectedCaveBaseInfo,
+                    textChannelsOverview: [...(selectedCaveBaseInfo.textChannelsOverview || []), channelDto],
+                });
+            }
+        }
+        else {
+            const channelDto: ChannelOverviewDTO = {
+                id: createChannelResponse.id,
+                name: createChannelResponse.name,
+            }
+
+            if (selectedCaveBaseInfo) {
+                setSelectedCaveBaseInfo({
+                    ...selectedCaveBaseInfo,
+                    voiceChannelsOverview : [...(selectedCaveBaseInfo.voiceChannelsOverview  || []), channelDto],
+                });
+            }
+        }
+    }
+
+    const createChannel = (createChannelRequest: CreateChannelRequest) => {
+        createChannelRequest.caveId = selectedCaveBaseInfo?.caveId as string;
+        ChannelServiceApi.createChannel(createChannelRequest).then((response) => {
+            updateChannelListAfterCreate(response);
+        }).catch((error) => {
+            console.error(error);
+        })
+    }
+
+    const createInvite = async (createInviteRequest: CreateCaveInviteRequest): Promise<string> => {
+        createInviteRequest.caveId = selectedCaveBaseInfo?.caveId as string;
+        try {
+            const response = await caveServiceApi.createCaveInvite(createInviteRequest);
+            console.log(response);
+            return response.id;  
+        } catch (error) {
+            console.error(error);
+            return ''; 
+        }
+    };
+
     return (
-        <div className='bg-primary-200 rounded-l-xl overflow-hidden text-secondary-100'>
-            <div className='relative'>
+        <div className='bg-primary-200 rounded-l-xl overflow-y-scroll scrollbar-hide text-secondary-100'>
+            <div className='sticky top-0 z-30 bg-primary-200'>
                 <div
                     onClick={toggleCaveMenuOpen}
                     className='flex items-center justify-between p-3 hover:bg-secondary-300 transition ease-all hover:cursor-pointer'>
-                    <h1 className='font-bold'>Server Name</h1>
+                    <h1 className='font-bold'>{selectedCaveBaseInfo?.caveName}</h1>
                     {
                         caveMenuOpen ? <CloseIcon style={{ fontSize: '1rem' }} /> : <ArrowForwardIosIcon style={{ fontSize: '1rem' }} className='rotate-90' />
                     }
@@ -52,16 +109,16 @@ function MainPanel() {
                     transition={{ duration: 0.1 }}
                     className='absolute w-full z-30 p-2'>
                     {
-                        caveMenuOpen && <CaveMenu 
-                        toggleCreateInviteMenuOpen={toggleCreateInviteMenuOpen} 
-                        toggleCreateChannelMenuOpen={toggleCreateChannelMenuOpen} 
-                        toggleCaveConfigMenuOpen={toggleCaveConfigMenuOpen}
+                        caveMenuOpen && <CaveMenu
+                            toggleCreateInviteMenuOpen={toggleCreateInviteMenuOpen}
+                            toggleCreateChannelMenuOpen={toggleCreateChannelMenuOpen}
+                            toggleCaveConfigMenuOpen={toggleCaveConfigMenuOpen}
                         />
                     }
                 </motion.div>
+                <hr className='mb-3' />
             </div>
-            <hr className='mb-3' />
-            <Channels />
+            <Channels textChannelsOverview={selectedCaveBaseInfo?.textChannelsOverview} voiceChannelsOverview={selectedCaveBaseInfo?.voiceChannelsOverview} toggleCreateChannelMenuOpen={toggleCreateChannelMenuOpen}  />
             {
                 createInviteMenuOpen && (
                     <motion.div
@@ -73,7 +130,7 @@ function MainPanel() {
                         animate={createInviteMenuOpen ? 'open' : 'closed'}
                         transition={{ duration: 0.1 }}
                     >
-                        <CaveInviteMenu toggleCreateInviteMenuOpen={toggleCreateInviteMenuOpen} />
+                        <CaveInviteMenu toggleCreateInviteMenuOpen={toggleCreateInviteMenuOpen} createInvite={createInvite} />
                     </motion.div>
                 )
             }
@@ -88,7 +145,7 @@ function MainPanel() {
                         animate={createChannelMenuOpen ? 'open' : 'closed'}
                         transition={{ duration: 0.1 }}
                     >
-                        <CaveCreateChannelMenu toggleCreateChannelMenuOpen={toggleCreateChannelMenuOpen} />
+                        <CaveCreateChannelMenu toggleCreateChannelMenuOpen={toggleCreateChannelMenuOpen} createChannel={createChannel} />
                     </motion.div>
                 )
             }

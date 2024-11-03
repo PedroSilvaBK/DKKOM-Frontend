@@ -3,18 +3,23 @@ import { IconButton } from '@mui/material';
 import GeneralSettings from '../components/EditVoiceChannelPage/GeneralSettings';
 import { useState } from 'react';
 import Permissions from '../components/EditVoiceChannelPage/Permissions';
+import { ChannelOverviewDTO } from '../api/CaveServiceApi';
 
-function EditVoiceChannelPage({ toogleEditVoiceChannel }: { toogleEditVoiceChannel: () => void }) {
+function EditVoiceChannelPage({ toogleEditVoiceChannel, selectedChannel }: { toogleEditVoiceChannel: (channelOverview: ChannelOverviewDTO | null)  => void, selectedChannel: ChannelOverviewDTO | null }) {
   const [activeTab, setActiveTab] = useState<'general-settings' | 'permissions'>('general-settings');
   
   const changeTab = (tab: 'general-settings' | 'permissions') => {
     setActiveTab(tab);
   }
 
+  const handleOnClickClose = () => {
+    toogleEditVoiceChannel(null)
+}
+
   return (
     <div className='h-full w-full glass-morphism p-3 flex flex-col gap-3'>
       <div className='flex items-center'>
-        <IconButton onClick={toogleEditVoiceChannel}>
+        <IconButton onClick={handleOnClickClose}>
           <CloseIcon style={{ fontSize: '1.2rem', color: 'white' }} />
         </IconButton>
         <h1 className='text-secondary-100 font-bold text-center text-xl w-full'>Edit Voice Channel</h1>
@@ -36,7 +41,7 @@ function EditVoiceChannelPage({ toogleEditVoiceChannel }: { toogleEditVoiceChann
         </div>
         <div className='bg-primary-200 rounded-xl h-full w-full p-3'>
           {activeTab === 'general-settings' && <GeneralSettings />}
-          {activeTab === 'permissions' && <Permissions />}
+          {activeTab === 'permissions' && <Permissions selectedChannel={selectedChannel}/>}
         </div>
       </div>
     </div>

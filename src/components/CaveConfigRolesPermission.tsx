@@ -1,15 +1,39 @@
 import React from 'react'
 import IOSSwitch from './IOSSwitch'
+import { Permission } from './PermissionType'
 
-function CaveConfigRolesPermission() {
+function CaveConfigRolesPermission({permission, role_permission, setFieldValue}: {permission: Permission, role_permission: number, setFieldValue: any}) {
+    const hasPermission = () => {
+        return (role_permission & permission.id) === permission.id;
+    }
+
+    const removePermission = () => {
+        setFieldValue('permissions', role_permission & ~permission.id)
+    }
+
+    const addPermission = () => {
+        setFieldValue('permissions', role_permission | permission.id)
+    }
+
+    const togglePermission = () => {
+        if(hasPermission()) {
+            removePermission()
+        } else {
+            addPermission()
+        }
+    }
+
+
     return (
         <div>
             <div className='flex justify-between'>
-                <h1>Permission Name</h1>
-                <IOSSwitch sx={{ m: 1 }} defaultChecked />
+                <h1>{permission.name}</h1>
+                <IOSSwitch sx={{ m: 1 }} checked={hasPermission()} onChange={togglePermission} />
             </div>
             <div>
-                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nisi aliquam eos, hic doloremque nesciunt magni cum consequuntur dignissimos consectetur quo fugit sint, corporis aperiam commodi?
+                {
+                    permission.description
+                }
             </div>
         </div>
     )

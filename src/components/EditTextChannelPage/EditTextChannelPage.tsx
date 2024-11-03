@@ -4,18 +4,23 @@ import { IconButton } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import GeneralSettings from '../EditVoiceChannelPage/GeneralSettings'
 import Permissions from '../EditVoiceChannelPage/Permissions'
+import { ChannelOverviewDTO } from '../../api/CaveServiceApi'
 
-function EditTextChannelPage({ toogleEditTextChannel }: { toogleEditTextChannel: () => void }) {
+function EditTextChannelPage({ toogleEditTextChannel, selectedChannel }: { toogleEditTextChannel: (channelOverview: ChannelOverviewDTO | null) => void, selectedChannel: ChannelOverviewDTO | null }) {
     const [activeTab, setActiveTab] = useState<'general-settings' | 'permissions'>('general-settings');
   
     const changeTab = (tab: 'general-settings' | 'permissions') => {
       setActiveTab(tab);
     }
 
+    const handleOnClickClose = () => {
+        toogleEditTextChannel(null)
+    }
+
     return (
         <div className='h-full w-full glass-morphism p-3 flex flex-col gap-3'>
             <div className='flex items-center'>
-                <IconButton onClick={toogleEditTextChannel}>
+                <IconButton onClick={handleOnClickClose}>
                     <CloseIcon style={{ fontSize: '1.2rem', color: 'white' }} />
                 </IconButton>
                 <h1 className='text-secondary-100 font-bold text-center text-xl w-full'>Edit Text Channel</h1>
@@ -37,7 +42,7 @@ function EditTextChannelPage({ toogleEditTextChannel }: { toogleEditTextChannel:
                 </div>
                 <div className='bg-primary-200 rounded-xl h-full w-full p-3'>
                     {activeTab === 'general-settings' && <GeneralSettings />}
-                    {activeTab === 'permissions' && <Permissions />}
+                    {activeTab === 'permissions' && <Permissions selectedChannel={selectedChannel} />}
                 </div>
             </div>
         </div>

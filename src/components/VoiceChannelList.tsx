@@ -1,14 +1,15 @@
 import React from 'react'
 import VoiceChannelListItem from './VoiceChannelListItem'
+import { ChannelOverviewDTO } from '../api/CaveServiceApi'
 
-function VoiceChannelList({toggleEditVoiceChannelMenu}: {toggleEditVoiceChannelMenu: () => void}) {
+function VoiceChannelList({toggleEditVoiceChannelMenu, channelsOverview}: {toggleEditVoiceChannelMenu: (channelOverview: ChannelOverviewDTO) => void, channelsOverview: ChannelOverviewDTO[] | undefined}) {
   return (
     <div>
-        {
-            Array.from({ length: 5 }).map((_, index) => (
-                <VoiceChannelListItem key={index} toggleEditVoiceChannelMenu={toggleEditVoiceChannelMenu} />
+      {
+            channelsOverview && channelsOverview.map((channelOverview, index) => (
+                <VoiceChannelListItem key={index} toggleEditVoiceChannelMenu={toggleEditVoiceChannelMenu} channelOverview={channelOverview} />
             ))
-        }
+      }
     </div>
   )
 }

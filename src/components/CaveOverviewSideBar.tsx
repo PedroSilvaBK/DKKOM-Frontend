@@ -1,14 +1,20 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { IconButton } from '@mui/material';
 import { motion } from 'framer-motion'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import CaveOverviewCard from './CaveOverviewCard';
 import CloseIcon from '@mui/icons-material/Close';
+import caveServiceApi, { CaveOverview, CreateCaveRequest } from '../api/CaveServiceApi';
+import { ErrorMessage, Field, Formik } from 'formik';
+import * as Yup from 'yup';
+import { useAuth } from './AuthProvider';
 
-function CaveOverviewSideBar() {
+function CaveOverviewSideBar({ setSelectedCave, userCavesOverview }: { setSelectedCave: (cave: any) => void, userCavesOverview: CaveOverview[] }) {
     const [sideBarOpen, setSideBarOpen] = useState<boolean>(false);
     const [activeMenu, setActiveMenu] = useState<'main' | 'create' | 'join'>('main');
-    
+
+    const { user } = useAuth();
+
     const [addCaveMenu, setAddCaveMenu] = useState<boolean>(false);
     const toggleAddCaveMenu = () => {
         setAddCaveMenu(!addCaveMenu);
@@ -28,12 +34,40 @@ function CaveOverviewSideBar() {
         exit: { x: '-100%', transition: { duration: 0.3 } },
     };
 
-
-
     const addCaveMenuVariants = {
         hidden: { opacity: 0 },
         visible: { opacity: 1, transition: { duration: 0.3 } },
     };
+
+
+
+    const initialValuesCreateCave = {
+        cave_name: '',
+        ownerId: '',
+    }
+
+    const validationSchemaCreateCave = Yup.object({
+        cave_name: Yup.string().required('Required'),
+    })
+
+    const onSubmitCreateCave = (values: typeof initialValuesCreateCave) => {
+        if (user) {
+            createCave({ name: values.cave_name, ownerId: user.id });
+        } else {
+            console.error('User is null');
+        }
+    }
+
+    const createCave = (createCaveRequest: CreateCaveRequest) => {
+                    caveServiceApi.createCave(createCaveRequest)
+                .then((response) => {
+                    setSelectedCave(response.id);
+                    setAddCaveMenu(false);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+    }
 
 
     return (
@@ -52,8 +86,8 @@ function CaveOverviewSideBar() {
                 <div className='bg-primary-200 p-3 rounded-xl w-full h-screen overflow-y-scroll scrollbar-hide'>
                     <div className='flex flex-col gap-3'>
                         {
-                            Array.from({ length: 20 }).map((_, index) => (
-                                <CaveOverviewCard key={index} isSideBarOpen={sideBarOpen} />
+                            userCavesOverview.map((caveOverview) => (
+                                <CaveOverviewCard key={caveOverview.id} isSideBarOpen={sideBarOpen} caveOverview={caveOverview} setSelectedCave={setSelectedCave} />
                             ))
                         }
                     </div>
@@ -113,20 +147,39 @@ function CaveOverviewSideBar() {
                                     className="p-3 bg-primary-200 rounded-xl w-full flex flex-col items-center gap-3"
                                 >
                                     <h1 className="text-2xl text-center text-secondary-100">Create Your Cave!</h1>
-                                    <form className="w-full flex flex-col gap-3">
-                                        <input
-                                            type="text"
-                                            placeholder="Cave Name"
-                                            className="p-2 rounded-lg"
-                                        />
-                                        <button type="submit"
-                                            className="w-full text-secondary-100 bg-primary-100 hover:bg-secondary-200 hover:text-primary-100 focus:outline-none focus:ring-4 font-medium rounded-xl text-sm px-5 py-2.5 text-center me-2 mb-2 transition ease-all"
-                                        >Create Cave
-                                        </button>
-                                    </form>
+                                    <Formik
+                                        initialValues={initialValuesCreateCave}
+                                        onSubmit={onSubmitCreateCave}
+                                        validationSchema={validationSchemaCreateCave}
+                                    >
+                                        {({ handleSubmit }) => (
+                                            <form onSubmit={handleSubmit} className="w-full flex flex-col gap-3">
+                                                <label htmlFor="cave_name" className="text-secondary-100">Cave Name</label>
+                                                <Field
+                                                    type="text"
+                                                    id="cave_name"
+                                                    name="cave_name"
+                                                    placeholder="Cave Name"
+                                                    className="p-2 rounded-lg"
+                                                />
+                                                <ErrorMessage
+                                                    name="cave_name"
+                                                    component="div"
+                                                    className="text-red-500 text-sm"
+                                                />
+
+                                                <button type="submit"
+                                                    className="w-full text-secondary-100 bg-primary-100 hover:bg-secondary-200 hover:text-primary-100 focus:outline-none focus:ring-4 font-medium rounded-xl text-sm px-5 py-2.5 text-center me-2 mb-2 transition ease-all"
+                                                >
+                                                    Create Cave
+                                                </button>
+                                            </form>
+                                        )}
+                                    </Formik>
                                     <button
                                         className="p-2 text-sm rounded-lg text-white self-start hover:underline"
                                         onClick={() => setActiveMenu('main')}
+                                        type='button'
                                     >
                                         Back to Menu
                                     </button>

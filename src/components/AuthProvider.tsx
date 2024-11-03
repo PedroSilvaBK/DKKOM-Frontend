@@ -3,7 +3,7 @@ import { jwtDecode } from 'jwt-decode';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface User {
-  id: number;
+  id: string;
   username: string;
   token: string;
 }

@@ -2,7 +2,7 @@ import { IconButton } from '@mui/material'
 import React from 'react'
 import CloseIcon from '@mui/icons-material/Close';
 import CaveConfigGeneral from './CaveConfigGeneral';
-import CaveConfigRoles from './CaveConfigRoles';
+import CaveConfigRoles from './CaveConfigRolesTab';
 
 function CaveConfig({ toggleCaveConfigMenuOpen }: { toggleCaveConfigMenuOpen: () => void }) {
     const [selectedMenu, setSelectedMenu] = React.useState<string>('General')
@@ -11,7 +11,7 @@ function CaveConfig({ toggleCaveConfigMenuOpen }: { toggleCaveConfigMenuOpen: ()
         <div
             className='absolute z-30 h-screen w-screen inset-0 grid place-items-center'>
             <div className='absolute bg-black opacity-30 h-full w-full' />
-            <div className='z-40 glass-morphism w-[80%] h-[80%]'>
+            <div className='z-40 glass-morphism w-[80%] h-[90%]'>
                 <div className="p-2 w-full h-full flex flex-col">
                     <div className='flex justify-between items-center'>
                         <h1 className='text-lg font-bold'>Cave Configuration</h1>

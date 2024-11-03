@@ -3,11 +3,17 @@ import AddIcon from '@mui/icons-material/Add';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import EditVoiceChannelPage from '../pages/EditVoiceChannelPage';
 import VoiceChannelList from './VoiceChannelList';
+import { ChannelOverviewDTO } from '../api/CaveServiceApi';
 
-function VoiceChannels() {
+function VoiceChannels(
+    { channelsOverview, toggleCreateChannelMenuOpen }: { channelsOverview: ChannelOverviewDTO[] | undefined, toggleCreateChannelMenuOpen: () => void }
+) {
     const [editVoiceChannelMenuOpen, setEditVoiceChannelMenuOpen] = useState<boolean>(false);
-    const toggleEditVoiceChannelMenu = () => {
-        setEditVoiceChannelMenuOpen(!editVoiceChannelMenuOpen);
+    const [selectedChannel, setSelectedChannel] = useState<ChannelOverviewDTO | null>(null);
+
+    const toggleEditVoiceChannelMenu = (channelOverview: ChannelOverviewDTO | null) => {
+        setSelectedChannel(channelOverview)
+        setEditVoiceChannelMenuOpen(!selectedChannel)
     }
 
     return (
@@ -17,18 +23,18 @@ function VoiceChannels() {
                     <ArrowForwardIosIcon style={{ fontSize: '1rem' }} className='rotate-90 group-hover:text-secondary-200' />
                     <h1 className='text-center group-hover:text-secondary-200'>Voice Channel</h1>
                 </div>
-                <div>
+                <div onClick={toggleCreateChannelMenuOpen}>
                     <AddIcon style={{ fontSize: '1rem' }} className='hover:text-secondary-200 hover:cursor-pointer' />
                 </div>
             </div>
             <div>
-                <VoiceChannelList toggleEditVoiceChannelMenu={toggleEditVoiceChannelMenu} />
+                <VoiceChannelList toggleEditVoiceChannelMenu={toggleEditVoiceChannelMenu} channelsOverview={channelsOverview} />
             </div>
             {
                 editVoiceChannelMenuOpen && (
                     <div className='absolute inset-0 h-screen w-screen grid place-items-center'>
                         <div className='h-[90vh] w-[55vw]'>
-                            <EditVoiceChannelPage toogleEditVoiceChannel={toggleEditVoiceChannelMenu} />
+                            <EditVoiceChannelPage toogleEditVoiceChannel={toggleEditVoiceChannelMenu} selectedChannel={selectedChannel} />
                         </div>
                     </div>
                 )

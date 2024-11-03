@@ -1,12 +1,8 @@
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { AnimationControls, motion, useAnimation } from 'framer-motion'
+import { CaveOverview } from '../api/CaveServiceApi';
 
-interface CaveOverviewCardProps {
-    isSideBarOpen: boolean;
-}
-
-function CaveOverviewCard({ isSideBarOpen }: CaveOverviewCardProps) {
-    const text: string = 'CAVE'
+function CaveOverviewCard({ isSideBarOpen, caveOverview, setSelectedCave }: { isSideBarOpen: boolean, caveOverview: CaveOverview, setSelectedCave: (cave: any) => void }) {
     const animationControls: AnimationControls = useAnimation()
 
     const showArrow = () => {
@@ -19,7 +15,7 @@ function CaveOverviewCard({ isSideBarOpen }: CaveOverviewCardProps) {
 
     return (
         <div>
-            <div onMouseEnter={showArrow} onMouseLeave={hideArrow} className='w-full overflow-hidden relative bg-secondary-100 rounded-lg p-3 text-center hover:cursor-pointer'>
+            <div onMouseEnter={showArrow} onMouseLeave={hideArrow} onClick={() => setSelectedCave(caveOverview?.id)} className='w-full overflow-hidden relative bg-secondary-100 rounded-lg p-3 text-center hover:cursor-pointer'>
                 <div>
                     <motion.div
                         initial='hidden'
@@ -36,7 +32,7 @@ function CaveOverviewCard({ isSideBarOpen }: CaveOverviewCardProps) {
                     </motion.div>
                 </div>
                 <div>
-                    {isSideBarOpen ? text : text[0]}
+                    {isSideBarOpen ? caveOverview?.name : caveOverview?.name[0]}
                 </div>
             </div>
         </div>
