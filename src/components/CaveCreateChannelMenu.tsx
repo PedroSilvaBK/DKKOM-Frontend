@@ -1,5 +1,4 @@
 import { IconButton } from '@mui/material'
-import React from 'react'
 import CloseIcon from '@mui/icons-material/Close';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';

@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { AnimationControls, motion, useAnimation } from 'framer-motion'
-import { useNavigate } from 'react-router-dom'
 import google_logo from '../assets/google_logo.png'
 
 function LogIn() {
     const animationControls: AnimationControls = useAnimation()
+
+    const backendUrl = import.meta.env.VITE_BACKEND_URL
 
     useEffect(() => {
         animationControls.start('visible')
@@ -26,7 +27,7 @@ function LogIn() {
             <div className='glass-morphism-login w-[40rem]'>
                 <form className='flex flex-col items-center gap-4 p-8'>
                     <h1 className='text-2xl font-bold text-center text-secondary-100'>Login</h1>
-                    <a className='bg-white rounded-full p-2' href='http://localhost:8080/'>
+                    <a className='bg-white rounded-full p-2' href={backendUrl}>
                         <img className='w-[4rem]' src={google_logo} />
                     </a>
                 </form>

@@ -14,7 +14,22 @@ interface CaveBootStrapInformation {
     owner: string;
     voiceChannelsOverview: ChannelOverviewDTO[];
     textChannelsOverview: ChannelOverviewDTO[];
+    userPermissionsCache: UserPermissionCache;
 }
+
+interface UserPermissionCache {
+    cavePermissions: number;
+    userRoles: string[];
+    channelPermissionsCacheHashMap: {
+        [channelId: string]: ChannelPermissionsCache; 
+    };
+}
+
+interface ChannelPermissionsCache {
+    allow: number;
+    deny: number;
+}
+
 interface ChannelOverviewDTO {
     id: string;
     name: string;
@@ -63,17 +78,20 @@ interface CreateCaveRoleRequest {
 interface CreateCaveRoleResponse {
     id: string;
     name: string;
+    position: number;
     permissions: number;
 }
 
 interface ChannelEntity {
     id: string;
     name: string;
+    position: number;
 }
 
 interface CaveRole {
     id: string;
     caveId?: string;
+    position: number;
     name: string;
     permissions: number;
 }
@@ -90,18 +108,50 @@ interface GetCaveRolesOverviewResponse {
     caveRoles: CaveRoleOverview[];
 }
 
+enum UserStatus {
+    ONLINE = "ONLINE",
+    OFFLINE = "OFFLINE",
+}
+
+interface MemberOverview {
+    id: string;
+    userId: string;
+    username: string;
+    userStatus: UserStatus;
+    roles: CaveRoleOverview[];
+}
+
+interface GetCaveMembersResponse {
+    memberOverviews: MemberOverview[];
+}
+
+interface AssignRoleRequest {
+    memberId: string;
+    roleIds: string[];
+}
+
+interface UserPresence {
+    userId: string;
+    status: UserStatus;
+}
+
 interface CaveServiceApi {
     createCave(request: CreateCaveRequest): Promise<CreateCaveResponse>;
     getCaveBootStrapInformation(caveId: string): Promise<CaveBootStrapInformation>;
     getCavesOverviewByUserId(userId: string): Promise<GetCavesOverviewResponse>;
 
+    assignRole(caveId: string, AssignRoleRequest: AssignRoleRequest): Promise<Boolean>;
+
     createCaveInvite(request: CreateCaveInviteRequest): Promise<CreateCaveInviteResponse>;
     joinCave(caveId: string): Promise<JoinCaveResponse>;
+
+    getCaveMembers(caveId: string): Promise<GetCaveMembersResponse>;
+    getCaveMembersFilteredByChannel(caveId: string, channelId: string): Promise<GetCaveMembersResponse>;
 
     createCaveRole(request: CreateCaveRoleRequest): Promise<CreateCaveRoleResponse>;
     getCaveRoles(caveId: string): Promise<GetCaveRolesResponse>;
     getCaveRolesOverview(caveId: string): Promise<GetCaveRolesOverviewResponse>;
-    updateCaveRole(request: CaveRole): Promise<Boolean>;
+    updateCaveRoles(request: CaveRole[]): Promise<Boolean>;
 }
 
 const caveServiceApi: CaveServiceApi = {
@@ -109,13 +159,18 @@ const caveServiceApi: CaveServiceApi = {
     getCaveBootStrapInformation: (caveId) => { return api.get(`/cave-service/cave/${caveId}`).then((response) => response.data); },
     getCavesOverviewByUserId: (userId) => { return api.get(`/cave-service/cave/overview/${userId}`).then((response) => response.data); },
 
+    assignRole: (caveId, request) => { return api.post(`/cave-service/cave/${caveId}/role/assign`, request).then((response) => response.data); },
+
     createCaveInvite: (request) => { return api.post(`/cave-service/cave/${request.caveId}/invite`, request).then((response) => response.data); },
     joinCave: (caveId) => { return api.get(`/cave-service/cave/invite/${caveId}`).then((response) => response.data); },
+
+    getCaveMembers: (caveId) => { return api.get(`/cave-service/cave/${caveId}/members`).then((response) => response.data); },
+    getCaveMembersFilteredByChannel: (caveId, channelId) => { return api.get(`/cave-service/cave/${caveId}/member/channel/${channelId}`).then((response) => response.data); },
 
     createCaveRole: (request) => { return api.post(`/cave-service/cave/${request.caveId}/role`, request).then((response) => response.data); },
     getCaveRoles: (caveId) => { return api.get(`/cave-service/cave/${caveId}/role`).then((response) => response.data); },
     getCaveRolesOverview: (caveId) => { return api.get(`/cave-service/cave/${caveId}/role/overview`).then((response) => response.data); },
-    updateCaveRole: (request) => { return api.patch(`/cave-service/cave/${request.caveId}/role`, request).then((response) => response.data); },
+    updateCaveRoles: (request) => { return api.patch(`/cave-service/cave/${request[0].caveId}/role`, request).then((response) => response.data); },
 }
 
 export default caveServiceApi;
@@ -136,5 +191,10 @@ export type {
     GetCaveRolesResponse,
     CaveRoleOverview,
     GetCaveRolesOverviewResponse,
-    ChannelEntity
+    ChannelEntity,
+    UserPermissionCache,
+    MemberOverview,
+    UserPresence,
 };
+
+export { UserStatus }

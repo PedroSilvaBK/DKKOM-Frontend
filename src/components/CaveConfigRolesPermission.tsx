@@ -1,25 +1,16 @@
-import React from 'react'
 import IOSSwitch from './IOSSwitch'
 import { Permission } from './PermissionType'
 
-function CaveConfigRolesPermission({permission, role_permission, setFieldValue}: {permission: Permission, role_permission: number, setFieldValue: any}) {
+function CaveConfigRolesPermission({permission, role_permission, addPermission, removePermission}: {permission: Permission, role_permission: number, addPermission: (permission: Permission) => void, removePermission: (permission: Permission) => void}) {
     const hasPermission = () => {
         return (role_permission & permission.id) === permission.id;
     }
 
-    const removePermission = () => {
-        setFieldValue('permissions', role_permission & ~permission.id)
-    }
-
-    const addPermission = () => {
-        setFieldValue('permissions', role_permission | permission.id)
-    }
-
     const togglePermission = () => {
         if(hasPermission()) {
-            removePermission()
+            removePermission(permission)
         } else {
-            addPermission()
+            addPermission(permission)
         }
     }
 

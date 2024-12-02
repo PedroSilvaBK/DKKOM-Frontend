@@ -1,7 +1,9 @@
 import CaveConfigRolesPermission from './CaveConfigRolesPermission'
 import { Permission } from './PermissionType'
+import { CaveRole } from '../api/CaveServiceApi'
 
-function CaveConfigRolesTab_Permissions({selectedRole, setFieldValue}: {selectedRole: any, setFieldValue: any}) {
+function CaveConfigRolesTab_Permissions({selectedRole, markRoleAsUpdated}: 
+    {selectedRole: any, markRoleAsUpdated: (role: CaveRole[]) => void}) {
     const permissions: Permission[] = [
         {
             name: 'SEE_CHANNELS',
@@ -52,15 +54,41 @@ function CaveConfigRolesTab_Permissions({selectedRole, setFieldValue}: {selected
             name: 'MOVE_MEMBERS',
             id: 1 << 10,
             description: "This permission allows the user to move members in voice channels in the server"
+        },
+        {
+            name: 'MANAGE_ROLES',
+            id: 1 << 11,
+            description: "This permission allows the user to manage roles in the server"
+        },
+        {
+            name: 'ADMIN',
+            id: 1 << 29,
+            description: "This permission allows the user to do anything in the server"
         }
     ]
+
+    const addPermission = (permission: Permission) => {
+        const updatedPermissions = selectedRole.permissions | permission.id
+        
+        markRoleAsUpdated([{...selectedRole, permissions: updatedPermissions}])
+    }
+
+    const removePermission = (permission: Permission) => {
+        const updatedPermissions = selectedRole.permissions & ~permission.id
+        markRoleAsUpdated([{...selectedRole, permissions: updatedPermissions}])
+    }
 
     return (
         <div className='flex flex-col gap-4 h-[35rem] overflow-y-scroll w-full'>
             {
                 selectedRole && permissions.map((permission, index) => (
                     <>
-                        <CaveConfigRolesPermission key={index} permission={permission} role_permission={selectedRole?.permissions || 0} setFieldValue={setFieldValue} />
+                        <CaveConfigRolesPermission key={index} 
+                        permission={permission} 
+                        role_permission={selectedRole?.permissions || 0} 
+                        addPermission={addPermission}
+                        removePermission={removePermission}
+                        />
                         <hr />
                     </>
                 ))

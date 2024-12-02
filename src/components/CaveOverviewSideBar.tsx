@@ -8,14 +8,17 @@ import caveServiceApi, { CaveOverview, CreateCaveRequest } from '../api/CaveServ
 import { ErrorMessage, Field, Formik } from 'formik';
 import * as Yup from 'yup';
 import { useAuth } from './AuthProvider';
+import SettingsMenu from './SettingsMenu';
 
-function CaveOverviewSideBar({ setSelectedCave, userCavesOverview }: { setSelectedCave: (cave: any) => void, userCavesOverview: CaveOverview[] }) {
+function CaveOverviewSideBar({ setSelectedCave, userCavesOverview, setUserCavesOverview }: { setSelectedCave: (cave: any) => void, userCavesOverview: CaveOverview[], setUserCavesOverview: (caves: CaveOverview[]) => void }) {
     const [sideBarOpen, setSideBarOpen] = useState<boolean>(false);
     const [activeMenu, setActiveMenu] = useState<'main' | 'create' | 'join'>('main');
 
     const { user } = useAuth();
 
     const [addCaveMenu, setAddCaveMenu] = useState<boolean>(false);
+
+
     const toggleAddCaveMenu = () => {
         setAddCaveMenu(!addCaveMenu);
     }
@@ -59,14 +62,15 @@ function CaveOverviewSideBar({ setSelectedCave, userCavesOverview }: { setSelect
     }
 
     const createCave = (createCaveRequest: CreateCaveRequest) => {
-                    caveServiceApi.createCave(createCaveRequest)
-                .then((response) => {
-                    setSelectedCave(response.id);
-                    setAddCaveMenu(false);
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
+        caveServiceApi.createCave(createCaveRequest)
+            .then((response) => {
+                setUserCavesOverview([...userCavesOverview, { id: response.id, name: createCaveRequest.name }]);
+                setSelectedCave(response.id);
+                setAddCaveMenu(false);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
     }
 
 
@@ -95,10 +99,11 @@ function CaveOverviewSideBar({ setSelectedCave, userCavesOverview }: { setSelect
                 <div className='w-full'>
                     <button type="button"
                         onClick={toggleAddCaveMenu}
-                        className="w-full text-primary-100 bg-secondary-200 hover:bg-primary-200 hover:text-secondary-200 focus:outline-none font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 transition ease-all">
+                        className="w-full text-primary-100 bg-secondary-200 hover:bg-primary-200 hover:text-secondary-200 focus:outline-none font-medium rounded-full text-sm px-5 py-2.5 text-center me-2  transition ease-all">
                         {sideBarOpen ? 'Add Cave' : '+'}
                     </button>
                 </div>
+                <SettingsMenu />
             </motion.div>
             {addCaveMenu && (
                 <motion.div

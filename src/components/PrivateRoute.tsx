@@ -1,6 +1,6 @@
 // PrivateRoute.tsx
 import React from 'react';
-import { Route, Navigate, PathRouteProps } from 'react-router-dom';
+import { Navigate, PathRouteProps } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
 
 interface PrivateRouteProps extends PathRouteProps {

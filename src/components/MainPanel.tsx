@@ -1,6 +1,6 @@
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Channels from './Channels';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import CaveMenu from './CaveMenu';
 import CloseIcon from '@mui/icons-material/Close';
 import { motion } from 'framer-motion'
@@ -11,6 +11,8 @@ import { ChannelOverviewDTO, CreateCaveInviteRequest } from '../api/CaveServiceA
 import ChannelServiceApi, { ChannelType, CreateChannelRequest, CreateChannelResponse } from '../api/ChannelService';
 import { useCave } from './CaveProvider';
 import  caveServiceApi from '../api/CaveServiceApi';
+import { useWebSocket } from './websockets/WebSockets';
+import permissionsService from './PermissionsService/PermissionsService';
 
 function MainPanel() {
     const [caveMenuOpen, setCaveMenuOpen] = useState<boolean>(false);
@@ -19,36 +21,69 @@ function MainPanel() {
     const [caveConfigMenuOpen, setCaveConfigMenuOpen] = useState<boolean>(false);
 
     const {selectedCaveBaseInfo, setSelectedCaveBaseInfo} = useCave();
+    const {newChannel} = useWebSocket();
+
+    useEffect(() => {
+        if (newChannel) {
+            updateChannelListAfterCreate(newChannel);
+        }
+    }, [newChannel])
 
 
     const toggleCaveMenuOpen = () => {
+        if (selectedCaveBaseInfo && !permissionsService.isOwnerOrAdmin(selectedCaveBaseInfo.userPermissionsCache.cavePermissions)
+            && !permissionsService.canManageChannels(selectedCaveBaseInfo.userPermissionsCache.cavePermissions)
+            && !permissionsService.canCreateInvite(selectedCaveBaseInfo.userPermissionsCache.cavePermissions)
+        ) {
+            return;
+        }
+
         setCaveMenuOpen(!caveMenuOpen);
     }
 
 
     const toggleCreateInviteMenuOpen = () => {
+        if (selectedCaveBaseInfo && !permissionsService.canCreateInvite(selectedCaveBaseInfo.userPermissionsCache.cavePermissions)) {
+            return;
+        }
         setCreateInviteMenuOpen(!createInviteMenuOpen);
     }
 
     const toggleCreateChannelMenuOpen = () => {
+        if (selectedCaveBaseInfo && !permissionsService.canManageChannels(selectedCaveBaseInfo?.userPermissionsCache.cavePermissions)) {
+            return;
+        }
         setCreateChannelMenuOpen(!createChannelMenuOpen);
     }
 
     const toggleCaveConfigMenuOpen = () => {
+        if (selectedCaveBaseInfo && !permissionsService.isOwnerOrAdmin(selectedCaveBaseInfo.userPermissionsCache.cavePermissions)) {
+            return;
+        }
         setCaveConfigMenuOpen(!caveConfigMenuOpen);
     }
 
     const updateChannelListAfterCreate = (createChannelResponse: CreateChannelResponse) => {
+        if (selectedCaveBaseInfo?.textChannelsOverview.find((channel) => channel.id === createChannelResponse.id) || selectedCaveBaseInfo?.voiceChannelsOverview.find((channel) => channel.id === createChannelResponse.id)) {
+            return;
+        }
+
         if (createChannelResponse.type === ChannelType.TEXT_CHANNEL) {
             const channelDto: ChannelOverviewDTO = {
                 id: createChannelResponse.id,
                 name: createChannelResponse.name,
             }
 
+            if (selectedCaveBaseInfo?.textChannelsOverview.includes(channelDto)) {
+                return;
+            }
+
             if (selectedCaveBaseInfo) {
                 setSelectedCaveBaseInfo({
                     ...selectedCaveBaseInfo,
-                    textChannelsOverview: [...(selectedCaveBaseInfo.textChannelsOverview || []), channelDto],
+                    textChannelsOverview: [...(selectedCaveBaseInfo.textChannelsOverview || []), channelDto].sort((a, b) => {
+                        return a.name.localeCompare(b.name);
+                    }),
                 });
             }
         }
@@ -58,10 +93,16 @@ function MainPanel() {
                 name: createChannelResponse.name,
             }
 
+            if (selectedCaveBaseInfo?.voiceChannelsOverview.includes(channelDto)) {
+                return;
+            }
+
             if (selectedCaveBaseInfo) {
                 setSelectedCaveBaseInfo({
                     ...selectedCaveBaseInfo,
-                    voiceChannelsOverview : [...(selectedCaveBaseInfo.voiceChannelsOverview  || []), channelDto],
+                    voiceChannelsOverview : [...(selectedCaveBaseInfo.voiceChannelsOverview  || []), channelDto].sort((a, b) => {
+                        return a.name.localeCompare(b.name);
+                    }),
                 });
             }
         }
@@ -110,6 +151,8 @@ function MainPanel() {
                     className='absolute w-full z-30 p-2'>
                     {
                         caveMenuOpen && <CaveMenu
+                            userPermissions={selectedCaveBaseInfo!.userPermissionsCache}
+                            toggleCaveMenuOpen={toggleCaveMenuOpen}
                             toggleCreateInviteMenuOpen={toggleCreateInviteMenuOpen}
                             toggleCreateChannelMenuOpen={toggleCreateChannelMenuOpen}
                             toggleCaveConfigMenuOpen={toggleCaveConfigMenuOpen}

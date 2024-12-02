@@ -14,6 +14,8 @@ function CaveInviteMenu({ toggleCreateInviteMenuOpen, createInvite }: { toggleCr
         setInviteLinkConfigOpen(!inviteLinkConfigOpen);
     }
 
+    const frontEndUrl = import.meta.env.VITE_FRONTEND_URL;
+
     const initialValuesCreateInvite = {
         inviteLinkExpireTime: 'ONE_DAY',
         inviteLinkMaxUses: '10',
@@ -34,7 +36,7 @@ function CaveInviteMenu({ toggleCreateInviteMenuOpen, createInvite }: { toggleCr
             caveInviteExpiration: values.inviteLinkExpireTime as CaveInviteExpiration,
             maxUses: parseInt(values.inviteLinkMaxUses),
         }).then((inviteId) => {
-            setInviteLink(`http://localhost:5173/invite/${inviteId}`)
+            setInviteLink(`${frontEndUrl}/invite/${inviteId}`)
         });
     }
 

@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import AddIcon from '@mui/icons-material/Add';
 import { motion, useAnimation } from 'framer-motion'
 import { IconButton } from '@mui/material';
 import PermissionList from './PermissionList';
-import caveServiceApi, { CaveRoleOverview, ChannelEntity } from '../../api/CaveServiceApi';
+import caveServiceApi, { CaveRoleOverview, ChannelEntity, ChannelOverviewDTO } from '../../api/CaveServiceApi';
 import { useCave } from '../CaveProvider';
 import ChannelServiceApi, { ChannelPermissionType, ChannelRole, CreateChannelRoleRequest } from '../../api/ChannelService';
 import { useFormik } from 'formik';
 
-function Permissions({ selectedChannel }: { selectedChannel: ChannelEntity | null }) {
+function Permissions({ selectedChannelToEdit }: { selectedChannelToEdit: ChannelOverviewDTO | null }) {
     const saveChangesAnimation = useAnimation()
     const { selectedCaveBaseInfo } = useCave()
 
@@ -39,8 +39,8 @@ function Permissions({ selectedChannel }: { selectedChannel: ChannelEntity | nul
     }
 
     const getChannelRoles = () => {
-        if (selectedChannel) {
-            ChannelServiceApi.getChannelRoles(selectedChannel.id).then((response) => {
+        if (selectedChannelToEdit) {
+            ChannelServiceApi.getChannelRoles(selectedChannelToEdit.id).then((response) => {
                 setChannelRoles(response.channelRoles)
                 setSelectedChannelRole(response.channelRoles[0])
             }).catch((error) => {
@@ -50,10 +50,10 @@ function Permissions({ selectedChannel }: { selectedChannel: ChannelEntity | nul
     }
 
     useEffect(() => {
-        if (selectedChannel) {
+        if (selectedChannelToEdit) {
             getChannelRoles()
         }
-    }, [selectedChannel])
+    }, [selectedChannelToEdit])
 
     const initialValues = {
         entityName: selectedChannelRole?.entityName,
@@ -102,7 +102,7 @@ function Permissions({ selectedChannel }: { selectedChannel: ChannelEntity | nul
 
     const createChannelRole = (request: ChannelEntity, type: ChannelPermissionType) => {
         const createChannelRoleRequest: CreateChannelRoleRequest = {
-            channelId: selectedChannel?.id || '',
+            channelId: selectedChannelToEdit?.id || '',
             entityId: request.id,
             entityName: request.name,
             allow: 0,
@@ -122,6 +122,7 @@ function Permissions({ selectedChannel }: { selectedChannel: ChannelEntity | nul
                 allow: response.allow,
                 deny: response.deny
             }])
+            setSearchRoleMenuOpen(false)
         }).catch((error) => {
             console.error(error)
         })

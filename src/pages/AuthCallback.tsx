@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../components/AuthProvider';
 
@@ -9,6 +9,8 @@ function AuthCallback() {
     useEffect(() => {
         const cookies = document.cookie.split(';');
 
+        console.log('Cookies:', cookies);
+        
         const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('jwt='));
         if (tokenCookie) {
             const token = tokenCookie.split('=')[1];

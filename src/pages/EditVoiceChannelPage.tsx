@@ -41,7 +41,7 @@ function EditVoiceChannelPage({ toogleEditVoiceChannel, selectedChannel }: { too
         </div>
         <div className='bg-primary-200 rounded-xl h-full w-full p-3'>
           {activeTab === 'general-settings' && <GeneralSettings />}
-          {activeTab === 'permissions' && <Permissions selectedChannel={selectedChannel}/>}
+          {activeTab === 'permissions' && <Permissions selectedChannelToEdit={selectedChannel}/>}
         </div>
       </div>
     </div>

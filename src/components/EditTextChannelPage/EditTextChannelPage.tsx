@@ -1,4 +1,3 @@
-import React from 'react'
 import { useState } from 'react'
 import { IconButton } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
@@ -6,7 +5,7 @@ import GeneralSettings from '../EditVoiceChannelPage/GeneralSettings'
 import Permissions from '../EditVoiceChannelPage/Permissions'
 import { ChannelOverviewDTO } from '../../api/CaveServiceApi'
 
-function EditTextChannelPage({ toogleEditTextChannel, selectedChannel }: { toogleEditTextChannel: (channelOverview: ChannelOverviewDTO | null) => void, selectedChannel: ChannelOverviewDTO | null }) {
+function EditTextChannelPage({ toogleEditTextChannel, selectedChannelToEdit }: { toogleEditTextChannel: (channelOverview: ChannelOverviewDTO | null) => void, selectedChannelToEdit: ChannelOverviewDTO | null }) {
     const [activeTab, setActiveTab] = useState<'general-settings' | 'permissions'>('general-settings');
   
     const changeTab = (tab: 'general-settings' | 'permissions') => {
@@ -42,7 +41,7 @@ function EditTextChannelPage({ toogleEditTextChannel, selectedChannel }: { toogl
                 </div>
                 <div className='bg-primary-200 rounded-xl h-full w-full p-3'>
                     {activeTab === 'general-settings' && <GeneralSettings />}
-                    {activeTab === 'permissions' && <Permissions selectedChannel={selectedChannel} />}
+                    {activeTab === 'permissions' && <Permissions selectedChannelToEdit={selectedChannelToEdit} />}
                 </div>
             </div>
         </div>

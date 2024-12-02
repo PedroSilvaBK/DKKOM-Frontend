@@ -14,6 +14,8 @@ function CaveConfigRolesTab() {
     const [Roles, setRoles] = useState<CaveRole[]>([])
     const [selectedRole, setSelectedRole] = useState<CaveRole | null>(null)
 
+    const [modifiableRolesForRoleList, setModifiableRolesForRoleList] = useState<CaveRole[]>([])
+
     useEffect(() => {
         if (selectedCaveBaseInfo) {
             getCaveRoles(selectedCaveBaseInfo.caveId)
@@ -24,7 +26,7 @@ function CaveConfigRolesTab() {
         caveServiceApi.createCaveRole(request)
 
             .then((response) => {
-                setRoles([...Roles, response])
+                setModifiableRolesForRoleList([...modifiableRolesForRoleList, response])
             }).catch((error) => {
                 console.error(error);
             })
@@ -35,31 +37,24 @@ function CaveConfigRolesTab() {
             .then((response) => {
                 setRoles(response.caveRoles)
                 setSelectedRole(response.caveRoles[0])
+                setModifiableRolesForRoleList(response.caveRoles)
             }).catch((error) => {
                 console.error(error);
             })
     }
 
     const initalValues = {
-        id: selectedRole?.id,
-        name: selectedRole?.name,
-        permissions: selectedRole?.permissions,
-        caveId: selectedCaveBaseInfo?.caveId || '',
+        roles: [],
     }
-    
-    const handleSubmit = (values: any) => {
-        const updatedCaveRole: CaveRole = {
-            id: values.id,
-            name: values.name,
-            permissions: values.permissions,
-            caveId: selectedCaveBaseInfo?.caveId || '',
-        }
 
-        caveServiceApi.updateCaveRole(updatedCaveRole)
-        .then((response) => {
-            if (response) {
-                setRoles(Roles.map(role => role.id === updatedCaveRole.id ? updatedCaveRole : role))
-            }
+
+    const handleSubmit = (values: any) => {
+        console.log(values)
+        caveServiceApi.updateCaveRoles(values.roles)
+        .then(() => {
+            // if (response) {
+            //     setRoles(Roles.map(role => role.id === updatedCaveRole.id ? updatedCaveRole : role))
+            // }
         })
         .finally(() => {
             saveChangesAnimation.start('hidden');
@@ -82,14 +77,35 @@ function CaveConfigRolesTab() {
 
     const cancelSubmit = () => {
         formik.resetForm()
-
+        setModifiableRolesForRoleList(Roles)
         saveChangesAnimation.start('hidden')
     }
 
     const handleRoleSelection = (role: CaveRole) => {
-        console.log(role)
         setSelectedRole(role);
-    };    
+    };
+
+    const markRoleAsUpdated = (updatedRoles: CaveRole[]) => {
+        const newRolesArray = formik.values.roles.map((role: CaveRole) => {
+            const updatedRole = updatedRoles.find(r => r.id === role.id);
+            return updatedRole ? updatedRole : role; 
+        });
+
+        updatedRoles.forEach((role) => {
+            if (!formik.values.roles.find((r: CaveRole) => r.id === role.id)) {
+                newRolesArray.push(role);
+            }
+        });
+
+        const updatedModifiableRolesList = modifiableRolesForRoleList.map((role: CaveRole) => {
+            const updatedRole = updatedRoles.find(r => r.id === role.id);
+            return updatedRole ? updatedRole : role;
+        });
+
+        setModifiableRolesForRoleList(updatedModifiableRolesList);
+
+        formik.setFieldValue("roles", newRolesArray);
+    }
 
     return (
         <div className='w-full h-full relative overflow-hidden'>
@@ -98,9 +114,19 @@ function CaveConfigRolesTab() {
             </div>
             <form onSubmit={formik.handleSubmit}>
                 <div className='flex gap-4 h-full w-full'>
-                    <CaveConfigRolesTab_RoleList createCaveRole={createCaveRole} Roles={Roles} selectedRole={selectedRole} handleRoleSelection={handleRoleSelection} />
+                    <CaveConfigRolesTab_RoleList
+                        createCaveRole={createCaveRole}
+                        Roles={modifiableRolesForRoleList}
+                        selectedRole={selectedRole}
+                        handleRoleSelection={handleRoleSelection}
+                        markRoleAsUpdated={markRoleAsUpdated}
+                    />
                     {
-                        selectedRole && <CaveConfigRolesTab_Permissions selectedRole={formik.values} setFieldValue={formik.setFieldValue} />
+                        selectedRole && <CaveConfigRolesTab_Permissions
+                            selectedRole={formik.values.roles.find((r: CaveRole) => r.id === selectedRole.id) || selectedRole}
+                            // selectedRole={selectedRole} 
+                            markRoleAsUpdated={markRoleAsUpdated}
+                        />
                     }
                 </div>
                 <motion.div

@@ -1,9 +1,11 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import AddIcon from '@mui/icons-material/Add';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import EditVoiceChannelPage from '../pages/EditVoiceChannelPage';
 import VoiceChannelList from './VoiceChannelList';
 import { ChannelOverviewDTO } from '../api/CaveServiceApi';
+import { useCave } from './CaveProvider';
+import permissionsService from './PermissionsService/PermissionsService';
 
 function VoiceChannels(
     { channelsOverview, toggleCreateChannelMenuOpen }: { channelsOverview: ChannelOverviewDTO[] | undefined, toggleCreateChannelMenuOpen: () => void }
@@ -11,7 +13,13 @@ function VoiceChannels(
     const [editVoiceChannelMenuOpen, setEditVoiceChannelMenuOpen] = useState<boolean>(false);
     const [selectedChannel, setSelectedChannel] = useState<ChannelOverviewDTO | null>(null);
 
+    const { selectedCaveBaseInfo } = useCave();
+
+
     const toggleEditVoiceChannelMenu = (channelOverview: ChannelOverviewDTO | null) => {
+        if (selectedCaveBaseInfo && !permissionsService.canManageChannels(selectedCaveBaseInfo.userPermissionsCache.cavePermissions)) {
+            return
+        }
         setSelectedChannel(channelOverview)
         setEditVoiceChannelMenuOpen(!selectedChannel)
     }
@@ -23,9 +31,13 @@ function VoiceChannels(
                     <ArrowForwardIosIcon style={{ fontSize: '1rem' }} className='rotate-90 group-hover:text-secondary-200' />
                     <h1 className='text-center group-hover:text-secondary-200'>Voice Channel</h1>
                 </div>
-                <div onClick={toggleCreateChannelMenuOpen}>
-                    <AddIcon style={{ fontSize: '1rem' }} className='hover:text-secondary-200 hover:cursor-pointer' />
-                </div>
+                {
+                    selectedCaveBaseInfo && permissionsService.canManageChannels(selectedCaveBaseInfo.userPermissionsCache.cavePermissions) && (
+                        <div onClick={toggleCreateChannelMenuOpen}>
+                            <AddIcon style={{ fontSize: '1rem' }} className='hover:text-secondary-200 hover:cursor-pointer' />
+                        </div>
+                    )
+                }
             </div>
             <div>
                 <VoiceChannelList toggleEditVoiceChannelMenu={toggleEditVoiceChannelMenu} channelsOverview={channelsOverview} />
