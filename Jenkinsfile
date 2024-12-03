@@ -7,6 +7,7 @@ pipeline {
         GOOGLE_APPLICATION_CREDENTIALS = credentials('GCP_KEY') // Use the ID from the stored credentials
         DOCKER_USERNAME = credentials('DOCKER_USERNAME')
         DOCKER_PASSWORD = credentials('DOCKER_PASSWORD')
+        SNYK_TOKEN = credentials('SNYK_TOKEN')
     }
     stages {
         stage('Authenticate with Google Cloud') {
@@ -30,13 +31,13 @@ pipeline {
                 sh 'gcloud container clusters get-credentials dcom-cluster --zone europe-west1-b --project d-com-437216'
             }
         }
-        stage('Build frontend') {
-            steps {
-                sh 'docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD'
-                sh 'npm install'
-                sh 'npm run build'
-            }
-        }
+        // stage('Build frontend') {
+        //     steps {
+        //         sh 'docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD'
+        //         sh 'npm install'
+        //         sh 'npm run build'
+        //     }
+        // }
         stage('Snyk Scan Frontend') {
             agent {
                 label 'snyk-agent'
