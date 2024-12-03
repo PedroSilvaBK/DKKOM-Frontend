@@ -36,6 +36,7 @@ pipeline {
         }
         stage('Deploy') {
             steps {
+                sh 'kubectl delete deployment frontend --ignore-not-found=true'
                 sh 'kubectl apply -f frontend-deployment.yaml'
             }
         }
