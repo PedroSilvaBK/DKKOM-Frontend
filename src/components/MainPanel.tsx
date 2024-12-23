@@ -135,56 +135,58 @@ function MainPanel() {
     };
 
     return (
-        <div className='bg-primary-200 rounded-l-xl overflow-y-scroll scrollbar-hide text-secondary-100 flex flex-col justify-between'>
-            <div>
-                <div className='sticky top-0 z-30 bg-primary-200'>
-                    <div
-                        onClick={toggleCaveMenuOpen}
-                        className='flex items-center justify-between p-3 hover:bg-secondary-300 transition ease-all hover:cursor-pointer'>
-                        <h1 className='font-bold'>{selectedCaveBaseInfo?.caveName}</h1>
-                        {
-                            caveMenuOpen ? <CloseIcon style={{ fontSize: '1rem' }} /> : <ArrowForwardIosIcon style={{ fontSize: '1rem' }} className='rotate-90' />
-                        }
+        <div className='bg-primary-200 rounded-l-xl overflow-y-scroll scrollbar-hide text-secondary-100'>
+            <div className='flex flex-col justify-between h-full'>
+                <div>
+                    <div className='sticky top-0 z-30 bg-primary-200'>
+                        <div
+                            onClick={toggleCaveMenuOpen}
+                            className='flex items-center justify-between p-3 hover:bg-secondary-300 transition ease-all hover:cursor-pointer'>
+                            <h1 className='font-bold'>{selectedCaveBaseInfo?.caveName}</h1>
+                            {
+                                caveMenuOpen ? <CloseIcon style={{ fontSize: '1rem' }} /> : <ArrowForwardIosIcon style={{ fontSize: '1rem' }} className='rotate-90' />
+                            }
+                        </div>
+                        <motion.div
+                            variants={{
+                                open: { scale: 1 },
+                                closed: { scale: 0 }
+                            }}
+                            initial='closed'
+                            animate={caveMenuOpen ? 'open' : 'closed'}
+                            transition={{ duration: 0.1 }}
+                            className='absolute w-full z-30 p-2'>
+                            {
+                                caveMenuOpen && <CaveMenu
+                                    userPermissions={selectedCaveBaseInfo!.userPermissionsCache}
+                                    toggleCaveMenuOpen={toggleCaveMenuOpen}
+                                    toggleCreateInviteMenuOpen={toggleCreateInviteMenuOpen}
+                                    toggleCreateChannelMenuOpen={toggleCreateChannelMenuOpen}
+                                    toggleCaveConfigMenuOpen={toggleCaveConfigMenuOpen}
+                                />
+                            }
+                        </motion.div>
+                        <hr className='mb-3' />
                     </div>
-                    <motion.div
-                        variants={{
-                            open: { scale: 1 },
-                            closed: { scale: 0 }
-                        }}
-                        initial='closed'
-                        animate={caveMenuOpen ? 'open' : 'closed'}
-                        transition={{ duration: 0.1 }}
-                        className='absolute w-full z-30 p-2'>
-                        {
-                            caveMenuOpen && <CaveMenu
-                                userPermissions={selectedCaveBaseInfo!.userPermissionsCache}
-                                toggleCaveMenuOpen={toggleCaveMenuOpen}
-                                toggleCreateInviteMenuOpen={toggleCreateInviteMenuOpen}
-                                toggleCreateChannelMenuOpen={toggleCreateChannelMenuOpen}
-                                toggleCaveConfigMenuOpen={toggleCaveConfigMenuOpen}
-                            />
-                        }
-                    </motion.div>
-                    <hr className='mb-3' />
+                    <Channels textChannelsOverview={selectedCaveBaseInfo?.textChannelsOverview} voiceChannelsOverview={selectedCaveBaseInfo?.voiceChannelsOverview} toggleCreateChannelMenuOpen={toggleCreateChannelMenuOpen} />
                 </div>
-                <Channels textChannelsOverview={selectedCaveBaseInfo?.textChannelsOverview} voiceChannelsOverview={selectedCaveBaseInfo?.voiceChannelsOverview} toggleCreateChannelMenuOpen={toggleCreateChannelMenuOpen} />
-            </div>
-            {
-                isVoiceConnected && (
-                    <div className='p-1'>
-                        <div className='flex items-center justify-between p-3 bg-primary-100 rounded-xl'>
-                            <div>
-                                <h1 className='font-bold p-1'>Connected</h1>
-                            </div>
-                            <div>
-                                <IconButton onClick={disconnectVoiceChannel}>
-                                    <CallEndIcon className='text-white' />
-                                </IconButton>
+                {
+                    isVoiceConnected && (
+                        <div className='p-1'>
+                            <div className='flex items-center justify-between p-3 bg-primary-100 rounded-xl'>
+                                <div>
+                                    <h1 className='font-bold p-1'>Connected</h1>
+                                </div>
+                                <div>
+                                    <IconButton onClick={disconnectVoiceChannel}>
+                                        <CallEndIcon className='text-white' />
+                                    </IconButton>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )
-            }
+                    )
+                }
+            </div>
             {
                 createInviteMenuOpen && (
                     <motion.div
