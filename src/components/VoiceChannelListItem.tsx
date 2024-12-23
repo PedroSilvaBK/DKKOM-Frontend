@@ -17,14 +17,14 @@ function VoiceChannelListItem({ toggleEditVoiceChannelMenu, channelOverview, use
         }
     };
 
-    const { connectVoiceChannel, remoteStreams } = useWebRTC();
+    const { connectVoiceChannel, remoteStreams, isVoiceConnected } = useWebRTC();
     const [volumeLevels, _] = useState<Map<string, number>>(new Map());
     const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
     const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
     const {user} = useAuth();
 
     const connect = () => {
-        if (channelOverview.id) {
+        if (channelOverview.id && !isVoiceConnected) {
             connectVoiceChannel(channelOverview.id);
         }
     };
