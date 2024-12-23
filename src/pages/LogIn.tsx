@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { AnimationControls, motion, useAnimation } from 'framer-motion'
 import google_logo from '../assets/google_logo.png'
 

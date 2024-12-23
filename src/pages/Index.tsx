@@ -6,7 +6,6 @@ import { useAuth } from '../components/AuthProvider';
 import { CaveProvider } from '../components/CaveProvider';
 import { useParams } from 'react-router-dom';
 import { WebSocketProvider } from '../components/websockets/WebSockets';
-import VoicePage from './VoicePage';
 import { WebRTCProvider } from '../components/webrtc/WebRTC';
 
 function Index() {

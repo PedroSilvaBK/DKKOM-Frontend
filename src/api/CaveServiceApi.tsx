@@ -1,6 +1,5 @@
 import { UserInChannel } from "../components/VoiceChannelList";
 import api from "./BaseApi";
-import { User } from "./UserServiceApi";
 
 interface CreateCaveRequest {
     name: string;
