@@ -175,6 +175,10 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 
                 const peer = createPeerConnection(stream, channelId);
                 const offer = await peer.createOffer();
+
+                console.log("Created offer");
+                console.log(offer);
+
                 await peer.setLocalDescription(offer);
         
                 setCurrentChannelId(channelId)
