@@ -13,7 +13,8 @@ type MessageType = "chat-message" | "update-user-permissions" |
     "user-joined-voice-channel" |
     "user-disconnect-voice-channel" |
     "webrtc-offer" |
-    "webrtc-answer";
+    "webrtc-answer" |
+    "webrtc-server-candidate";
 
 type WebSocketContextType = {
     socket: WebSocket | null;
@@ -33,6 +34,7 @@ type WebSocketContextType = {
     offer: any | null;
     newUserJoinedVoiceChannel: UserJoinedVoiceChannel | null;
     userLeftVoiceChannel: UserJoinedVoiceChannel | null;
+    candidate: RTCIceCandidate | null;
 };
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -84,6 +86,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
     const [userLeftVoiceChannel, setUserLeftVoiceChannel] = useState<UserJoinedVoiceChannel | null>(null);
 
     const [answer, setAnswer] = useState<RTCSessionDescriptionInit | null>(null);
+    const [candidate, setCandidate] = useState<RTCIceCandidate | null>(null);
     const [offer, setOffer] = useState<any | null>(null);
 
     const backendUrl = import.meta.env.VITE_BACKEND_WS_URL;
@@ -215,6 +218,9 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
             case 'webrtc-answer':
                 setAnswer(data.data);
                 break;
+            case 'webrtc-server-candidate':
+                setCandidate(data.data);
+                break;
             case 'webrtc-offer':
                 setOffer(data.data);
                 break;
@@ -251,7 +257,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
             subscribe_channel, setChatMessages, selectCave,
             newPermissions, newPresence, reconnecting, newChannel,
             newCaveRole, roleAssignedToMember, userJoinedCave, 
-            answer, offer, newUserJoinedVoiceChannel, userLeftVoiceChannel
+            answer, offer, newUserJoinedVoiceChannel, userLeftVoiceChannel, candidate
         }}>
             {children}
         </WebSocketContext.Provider>

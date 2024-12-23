@@ -24,7 +24,7 @@ type WebRTCContextType = {
 
 export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
     const { user } = useAuth()
-    const { socket, answer, offer } = useWebSocket()
+    const { socket, answer, offer, candidate } = useWebSocket()
     const pcRef = useRef<RTCPeerConnection | null>(null);
 
     const [isVoiceConnected, setIsVoiceConnected] = useState<boolean>(false);
@@ -55,6 +55,16 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
             handleOffer(offer);
         }
     }, [offer]);
+
+    useEffect(() => {
+        if (candidate) {
+            console.log(candidate)
+            const peer = pcRef.current;
+            if (peer) {
+                peer.addIceCandidate(candidate);
+            }
+        }
+    }, [candidate]);
 
     const createPeerConnection = (stream: MediaStream, currentChannelId: string): RTCPeerConnection => {
         const configuration: RTCConfiguration = {
@@ -175,10 +185,7 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 
                 const peer = createPeerConnection(stream, channelId);
                 const offer = await peer.createOffer();
-
-                console.log("Created offer");
-                console.log(offer);
-
+                
                 await peer.setLocalDescription(offer);
         
                 setCurrentChannelId(channelId)
