@@ -6,6 +6,7 @@ import Index from './pages/Index'
 import AuthCallback from './pages/AuthCallback'
 import PrivateRoute from './components/PrivateRoute'
 import InvitePage from './pages/InvitePage'
+import VoicePage from './pages/VoicePage'
 
 function App() {
   return (

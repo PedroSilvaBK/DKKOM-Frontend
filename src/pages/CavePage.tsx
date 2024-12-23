@@ -16,7 +16,6 @@ function CavePage({ selectedCaveId }: { selectedCaveId: string }) {
 
     useEffect(() => {
         if (selectedCaveId && socket) {
-            console.log("called useeffect in cavepage");
             const fetchCaveInfo = async () => {
                 try {
                     const caveInfo = await getCaveBootstrapInfo(selectedCaveId);

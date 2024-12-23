@@ -6,6 +6,8 @@ import { useAuth } from '../components/AuthProvider';
 import { CaveProvider } from '../components/CaveProvider';
 import { useParams } from 'react-router-dom';
 import { WebSocketProvider } from '../components/websockets/WebSockets';
+import VoicePage from './VoicePage';
+import { WebRTCProvider } from '../components/webrtc/WebRTC';
 
 function Index() {
     const [selectedCaveId, setSelectedCaveId] = useState<string | null>(null);
@@ -39,18 +41,20 @@ function Index() {
     return (
         <div className='h-fit flex '>
             <WebSocketProvider>
-                <CaveOverviewSideBar setSelectedCave={setSelectedCaveId} userCavesOverview={userCavesOverview} setUserCavesOverview={setUserCavesOverview} />
-                {
-                    selectedCaveId
-                        ? (
-                            <CaveProvider>
-                                <CavePage selectedCaveId={selectedCaveId} />
-                            </CaveProvider>
-                        )
-                        : <div className='flex-1 flex items-center justify-center'>
-                            <p className='text-2xl text-gray-500'>Select a cave to view details</p>
-                        </div>
-                }
+                <WebRTCProvider>
+                    <CaveOverviewSideBar setSelectedCave={setSelectedCaveId} userCavesOverview={userCavesOverview} setUserCavesOverview={setUserCavesOverview} />
+                    {
+                        selectedCaveId
+                            ? (
+                                <CaveProvider>
+                                    <CavePage selectedCaveId={selectedCaveId} />
+                                </CaveProvider>
+                            )
+                            : <div className='flex-1 flex items-center justify-center'>
+                                <p className='text-2xl text-gray-500'>Select a cave to view details</p>
+                            </div>
+                    }
+                </WebRTCProvider>
             </WebSocketProvider>
         </div>
     )

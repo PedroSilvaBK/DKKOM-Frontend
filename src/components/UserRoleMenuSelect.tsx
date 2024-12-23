@@ -23,7 +23,7 @@ function UserRoleMenuSelect({selectedMember, caveRoles, updateRoles, closeMenu}:
 
     useEffect(() => {
         if (selectedMember && caveRoles && selectedCaveBaseInfo) {
-            if (permissionsService.isOwnerOrAdmin(selectedCaveBaseInfo.userPermissionsCache.cavePermissions)) {
+            if (permissionsService.isOwer(selectedCaveBaseInfo.userPermissionsCache.cavePermissions)) {
                 setDisplayedRoles(caveRoles);
                 return;
             }

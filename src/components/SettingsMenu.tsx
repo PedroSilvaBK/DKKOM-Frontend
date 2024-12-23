@@ -5,12 +5,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import SettingsIcon from '@mui/icons-material/Settings';
 import SettingsMenu_UserInfoTab from './SettingsMenu_UserInfoTab';
 import { useAuth } from './AuthProvider';
+import SettingsMenu_InputSettings from './SettingsMenu_InputSettings';
 
 function SettingsMenu() {
     const [settingsMenu, setSettingsMenu] = useState<boolean>(false);
     const [activeMenu, setActiveMenu] = useState<string>('user-info');
 
-    const {logout} = useAuth();
+    const { logout } = useAuth();
 
     type MenuOption = {
         id: string;
@@ -20,7 +21,12 @@ function SettingsMenu() {
     const menuOptions: MenuOption[] = [{
         id: 'user-info',
         name: 'User Info',
-    }];
+    },
+    {
+        id: "input-settings",
+        name: "Input Settings"
+    }
+    ];
 
     const menuVariants = {
         hidden: { opacity: 0 },
@@ -49,29 +55,34 @@ function SettingsMenu() {
 
                             <div className='flex text-secondary-100 gap-2 h-full'>
                                 <div className='flex justify-between flex-col gap-3 items-center h-full w-[10rem] bg-primary-200 rounded-lg p-3'>
-                                    {
-                                        menuOptions.map((menuOption) => (
-                                            <div
-                                                key={menuOption.id}
-                                                className={`hover:bg-secondary-300 transition ease-all w-full rounded-xl p-2 text-center hover:cursor-pointer ${activeMenu === menuOption.id ? 'bg-secondary-300' : ''}`}
-                                                onClick={() => setActiveMenu(menuOption.id)}
-                                            >
-                                                <h1>{menuOption.name}</h1>
-                                            </div>
-                                        ))
-                                    }
-                                            <div
-                                            onClick={logout}
-                                                className={`hover:bg-secondary-300 transition ease-all w-full rounded-xl p-2 text-center hover:cursor-pointer text-red-500 `}
-                                            >
-                                                <h1>Log Out</h1>
-                                            </div>
+                                    <div>
+                                        {
+                                            menuOptions.map((menuOption) => (
+                                                <div
+                                                    key={menuOption.id}
+                                                    className={`hover:bg-secondary-300 transition ease-all w-full rounded-xl p-2 text-center hover:cursor-pointer ${activeMenu === menuOption.id ? 'bg-secondary-300' : ''}`}
+                                                    onClick={() => setActiveMenu(menuOption.id)}
+                                                >
+                                                    <h1>{menuOption.name}</h1>
+                                                </div>
+                                            ))
+                                        }
+                                    </div>
+                                    <div
+                                        onClick={logout}
+                                        className={`hover:bg-secondary-300 transition ease-all w-full rounded-xl p-2 text-center hover:cursor-pointer text-red-500 `}
+                                    >
+                                        <h1>Log Out</h1>
+                                    </div>
                                 </div>
                                 <div className="w-full bg-primary-200 p-3 rounded-xl flex ">
                                     <div className='w-full'>
-                                    {activeMenu === 'user-info' && (
-                                        <SettingsMenu_UserInfoTab />
-                                    )}
+                                        {activeMenu === 'user-info' && (
+                                            <SettingsMenu_UserInfoTab />
+                                        )}
+                                        {activeMenu === 'input-settings' && (
+                                            <SettingsMenu_InputSettings />
+                                        )}
                                     </div>
                                     <div>
                                         <IconButton onClick={() => setSettingsMenu(false)}>

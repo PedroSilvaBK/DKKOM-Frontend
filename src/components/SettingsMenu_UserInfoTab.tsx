@@ -7,7 +7,7 @@ import { useAuth } from './AuthProvider';
 
 function SettingsMenu_UserInfoTab() {
     const saveChangesAnimation = useAnimation()
-    const { user, login } = useAuth()
+    const { user, login, logout } = useAuth()
 
     const [userInfo, setUserInfo] = useState<User | null>(null)
 
@@ -22,10 +22,20 @@ function SettingsMenu_UserInfoTab() {
 
         UserServiceApi.getUserById(user.id).then((response) => {
             setUserInfo(response);
-            console.log(response)
         }).catch((error) => {
             console.error(error);
         })
+    }
+
+    const deleteAccount = () => {
+        if (user?.id){
+            UserServiceApi.deleteUser(user.id).then((response) => {
+                console.log(response)
+                logout()
+            }).catch((error) => {
+                console.error(error);
+            })
+        }
     }
 
     const updateUserInfo = (userInfo: User) => {
@@ -90,6 +100,9 @@ function SettingsMenu_UserInfoTab() {
         saveChangesAnimation.start('hidden')
     }
 
+    const handleDeleteAccount = () => {
+        deleteAccount()
+    }
 
     return (
         <div className='h-full overflow-hidden relative'>
@@ -136,6 +149,9 @@ function SettingsMenu_UserInfoTab() {
                         {formik.touched.name && formik.errors.name && (
                             <div className="text-red-500 text-sm">{formik.errors.name}</div>
                         )}
+                        <div className='mt-4'>
+                            <button type='button' onClick={handleDeleteAccount} className='w-full p-2 bg-red-500 rounded-2xl outline-none hover:bg-primary-200 hover:border-1 hover:border-red-500 border-2 border-transparent hover:text-red-500  transition-all ease-all'>Delete Account</button>
+                        </div>
                     </div>
                 </div>
                 <motion.div

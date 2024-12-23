@@ -12,12 +12,14 @@ interface UserServiceApi {
     getUserById(userId: string): Promise<User>;
     updateUser(user: User): Promise<User>;
     getNewToken(): Promise<string>;
+    deleteUser(userId: string): Promise<void>;
 }
 
 const UserServiceApi: UserServiceApi = {
     getUserById: (userId) => { return api.get(`/user-service/user/${userId}`).then((response) => response.data); },
     updateUser: (user) => { return api.put(`/user-service/user/${user.id}`, user).then((response) => response.data); },
-    getNewToken: () => { return api.get('/user-service/user/token').then((response) => response.data); }
+    getNewToken: () => { return api.get('/user-service/user/token').then((response) => response.data); },
+    deleteUser: (userId) => { return api.delete(`/user-service/user/${userId}`).then((response) => response.data); }
 }
 
 

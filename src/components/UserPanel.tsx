@@ -208,7 +208,6 @@ function UserPanel() {
         }
     }, [roleAssignedToMember]);
 
-
     useEffect(() => {
         getCaveRolesOverview().then((roles) => {
             getCaveMembersFilteredByChannel(roles);
@@ -265,7 +264,7 @@ function UserPanel() {
 
         if (caveRoles?.length === 0) return;
 
-        if (!permissionsService.canManageRoles(selectedCaveBaseInfo.userPermissionsCache.cavePermissions)){
+        if (!permissionsService.canManageRoles(selectedCaveBaseInfo.userPermissionsCache.cavePermissions) && !permissionsService.isAdmin(selectedCaveBaseInfo.userPermissionsCache.cavePermissions)) {
             return;
         }
 

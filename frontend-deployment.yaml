@@ -29,6 +29,6 @@ spec:
     app: frontend
   ports:
     - protocol: TCP
-      port: 80         # External port (how the service is exposed)
-      targetPort: 80     # Internal port (the port your app runs on inside the container)
-  type: ClusterIP        # Use LoadBalancer or NodePort if external access is needed
+      port: 80         
+      targetPort: 80   
+  type: ClusterIP     

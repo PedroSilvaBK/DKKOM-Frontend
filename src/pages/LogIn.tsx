@@ -1,10 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { AnimationControls, motion, useAnimation } from 'framer-motion'
 import google_logo from '../assets/google_logo.png'
 
 function LogIn() {
     const animationControls: AnimationControls = useAnimation()
-
+    
     const backendUrl = import.meta.env.VITE_BACKEND_URL
 
     useEffect(() => {

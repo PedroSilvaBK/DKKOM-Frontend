@@ -1,4 +1,6 @@
+import { UserInChannel } from "../components/VoiceChannelList";
 import api from "./BaseApi";
+import { User } from "./UserServiceApi";
 
 interface CreateCaveRequest {
     name: string;
@@ -33,6 +35,10 @@ interface ChannelPermissionsCache {
 interface ChannelOverviewDTO {
     id: string;
     name: string;
+}
+
+interface VoiceChannelOverviewDTO extends ChannelOverviewDTO {
+    connectedUsers: UserInChannel[];
 }
 
 interface CaveOverview {
@@ -195,6 +201,7 @@ export type {
     UserPermissionCache,
     MemberOverview,
     UserPresence,
+    VoiceChannelOverviewDTO,
 };
 
 export { UserStatus }

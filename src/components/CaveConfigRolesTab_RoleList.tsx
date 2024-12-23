@@ -5,6 +5,7 @@ import { CaveRole, CreateCaveRoleRequest } from '../api/CaveServiceApi';
 import { useCave } from './CaveProvider';
 import { DndContext, closestCenter, DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
+import permissionsService from './PermissionsService/PermissionsService';
 
 function CaveConfigRolesTab_RoleList({ createCaveRole, Roles, handleRoleSelection, selectedRole, markRoleAsUpdated }: 
     { createCaveRole: (request: CreateCaveRoleRequest) => void, Roles: CaveRole[], handleRoleSelection: (role: CaveRole) => void, selectedRole: CaveRole | null, markRoleAsUpdated: (role: CaveRole[]) => void }) {
@@ -26,8 +27,21 @@ function CaveConfigRolesTab_RoleList({ createCaveRole, Roles, handleRoleSelectio
     const [sRoles, setSRoles] = useState<CaveRole[]>(Roles)
 
     useEffect(() => {
-        setSRoles(Roles)
+        if (selectedCaveBaseInfo){
+            if (permissionsService.isOwer(selectedCaveBaseInfo.userPermissionsCache.cavePermissions)) {
+                setSRoles(Roles);
+                return;
+            }
+    
+            const memberHighestRole = Roles.find((role) => role.id === selectedCaveBaseInfo?.userPermissionsCache.userRoles[0]);
+    
+            setSRoles(filterRolesUserCanAssign(Roles, memberHighestRole || Roles[0]));
+        }
     }, [Roles])
+
+    const filterRolesUserCanAssign = (roles: CaveRole[], memberHighestRole: CaveRole) => {
+        return roles.filter((role) => role.position > memberHighestRole.position);
+    }
 
     const [originalPosition, setOriginalPosition] = useState<number | null>(null);
     const [moveHistory, setMoveHistory] = useState<{ roleId: string, from: number, to: number }[]>([]);

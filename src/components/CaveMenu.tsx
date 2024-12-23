@@ -26,7 +26,7 @@ function CaveMenu({ toggleCreateInviteMenuOpen, toggleCreateChannelMenuOpen,  to
     <div ref={menuRef} className='h-full w-full glass-morphism p-1 gap-4'>
       <div className='bg-primary-200 rounded-xl p-1 flex flex-col gap-4'>
         {
-          userPermissions && permissionsService.canCreateInvite(userPermissions.cavePermissions) && (
+          userPermissions && (permissionsService.canCreateInvite(userPermissions.cavePermissions) || permissionsService.isAdmin(userPermissions.cavePermissions)) && (
             <div className='flex items-center hover:bg-secondary-300 hover:cursor-pointer p-1 rounded-xl' onClick={toggleCreateInviteMenuOpen}>
               <h1 className='text-secondary-100 text-center text-lg w-full'>Invite users</h1>
               <GroupAddIcon />
@@ -34,7 +34,7 @@ function CaveMenu({ toggleCreateInviteMenuOpen, toggleCreateChannelMenuOpen,  to
           )
         }
         {
-          userPermissions && permissionsService.canManageChannels(userPermissions.cavePermissions) && (
+          userPermissions && (permissionsService.canManageChannels(userPermissions.cavePermissions) || permissionsService.isAdmin(userPermissions.cavePermissions))  && (
             <div className='flex items-center hover:bg-secondary-300 hover:cursor-pointer p-1 rounded-xl' onClick={toggleCreateChannelMenuOpen}>
               <h1 className='text-secondary-100 text-center text-lg w-full'>Create channel</h1>
               <AddCircleIcon />
@@ -42,7 +42,7 @@ function CaveMenu({ toggleCreateInviteMenuOpen, toggleCreateChannelMenuOpen,  to
           )
         }
         {
-          userPermissions && permissionsService.isOwnerOrAdmin(userPermissions.cavePermissions) && (
+          userPermissions && permissionsService.isAdmin(userPermissions.cavePermissions) && (
             <div className='flex items-center hover:bg-secondary-300 hover:cursor-pointer p-1 rounded-xl' onClick={toggleCaveConfigMenuOpen}>
               <h1 className='text-secondary-100 text-center text-lg w-full'>Cave config</h1>
               <SettingsIcon />

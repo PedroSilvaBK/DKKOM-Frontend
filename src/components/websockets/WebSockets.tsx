@@ -4,12 +4,16 @@ import { Message } from "../../api/MessageServiceApi";
 import { CaveBootStrapInformation, CaveRoleOverview, UserPermissionCache, UserPresence } from "../../api/CaveServiceApi";
 import { CreateChannelResponse } from "../../api/ChannelService";
 
-type MessageType = "chat-message" | "update-user-permissions" | 
-"update-user-presence" |
- "update-channel-list" | 
- "cave-role-created" | 
- "role-assigned-to-member" |
- "user-joined-cave";
+type MessageType = "chat-message" | "update-user-permissions" |
+    "update-user-presence" |
+    "update-channel-list" |
+    "cave-role-created" |
+    "role-assigned-to-member" |
+    "user-joined-cave" |
+    "user-joined-voice-channel" |
+    "user-disconnect-voice-channel" |
+    "webrtc-offer" |
+    "webrtc-answer";
 
 type WebSocketContextType = {
     socket: WebSocket | null;
@@ -25,6 +29,10 @@ type WebSocketContextType = {
     newCaveRole: CaveRoleCreated | null;
     roleAssignedToMember: RoleAssignedToMember | null;
     userJoinedCave: UserJoinedCave | null;
+    answer: RTCSessionDescriptionInit | null;
+    offer: any | null;
+    newUserJoinedVoiceChannel: UserJoinedVoiceChannel | null;
+    userLeftVoiceChannel: UserJoinedVoiceChannel | null;
 };
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -52,6 +60,12 @@ type UserJoinedCave = {
     username: string;
 }
 
+type UserJoinedVoiceChannel = {
+    userId: string;
+    roomId: string;
+    username: string;
+}
+
 
 export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }) => {
     const [socket, setSocket] = useState<WebSocket | null>(null);
@@ -66,20 +80,33 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
     const [newCaveRole, setCaveNewRole] = useState<CaveRoleCreated | null>(null);
     const [roleAssignedToMember, setRoleAssignedToMember] = useState<RoleAssignedToMember | null>(null);
     const [userJoinedCave, setUserJoinedCave] = useState<UserJoinedCave | null>(null);
+    const [newUserJoinedVoiceChannel, setNewUserJoinedVoiceChannel] = useState<any | null>(null);
+    const [userLeftVoiceChannel, setUserLeftVoiceChannel] = useState<UserJoinedVoiceChannel | null>(null);
+
+    const [answer, setAnswer] = useState<RTCSessionDescriptionInit | null>(null);
+    const [offer, setOffer] = useState<any | null>(null);
 
     const backendUrl = import.meta.env.VITE_BACKEND_WS_URL;
 
     useEffect(() => {
         let ws: WebSocket | null = null;
+        let reconnectInterval: ReturnType<typeof setInterval> | null = null;
 
         const initializeWebSocket = async () => {
             try {
                 const authToken = await wsAuthApi.getAuthToken();
-                
+
                 ws = new WebSocket(`${backendUrl}/ws/cave?token=${authToken}`);
 
                 ws.onopen = () => {
                     console.log('Connected to WebSocket');
+                    setReconnecting(false);
+
+                    // Clear the reconnect interval if connected
+                    if (reconnectInterval) {
+                        clearInterval(reconnectInterval);
+                        reconnectInterval = null;
+                    }
                 };
 
                 ws.onmessage = (event: MessageEvent) => {
@@ -92,47 +119,56 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
                 };
 
                 ws.onclose = () => {
-                    console.log("Reconnecting to WebSocket in 5 seconds...");
+                    console.log('Disconnected from WebSocket. Reconnecting...');
                     setReconnecting(true);
-                    reconnect();
-                    console.log('Disconnected from WebSocket');
+                    if (!reconnectInterval) {
+                        startReconnect();
+                    }
                 };
 
                 setSocket(ws);
-
-                return () => {
-                    if (ws) {
-                        ws.close();
-                    }
-                };
             } catch (error) {
                 console.error('Error initializing WebSocket:', error);
+                if (!reconnectInterval) {
+                    startReconnect();
+                }
             }
         };
 
-        initializeWebSocket();
+        const startReconnect = () => {
+            reconnectInterval = setInterval(() => {
+                console.log('Attempting to reconnect to WebSocket...');
+                initializeWebSocket();
+            }, 5000);
+        };
 
-        setInterval(() => {
+        const sendPing = () => {
             if (ws && ws.readyState === WebSocket.OPEN) {
                 console.log('Sending ping to WebSocket');
                 ws.send(JSON.stringify({ type: 'ping' }));
             }
-        }, 50000);
+        };
 
-        const reconnect = () => {
-            setTimeout(() => {
-                initializeWebSocket();
-                setReconnecting(false);
-            }, 5000);
-        }
+        // Initialize WebSocket connection
+        initializeWebSocket();
+
+        // Ping the WebSocket periodically
+        const pingInterval = setInterval(sendPing, 50000);
 
         return () => {
             if (ws) {
                 ws.close();
                 console.log('WebSocket connection closed');
             }
+
+            if (reconnectInterval) {
+                clearInterval(reconnectInterval);
+            }
+
+            clearInterval(pingInterval);
         };
     }, []);
+
 
     const subscribe_channel = (channelId: string) => {
         sendMessage({ type: 'subscribe_channel', properties: { channelId: channelId } });
@@ -168,6 +204,20 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
                 setUserJoinedCave(data.data);
                 console.log('User joined cave:', data.data);
                 break;
+            case 'user-joined-voice-channel':
+                console.log('User joined voice channel:', data.data);
+                setNewUserJoinedVoiceChannel(data.data);
+                break;
+            case 'user-disconnect-voice-channel':
+                console.log('User disconnect voice channel:', data.data);
+                setUserLeftVoiceChannel(data.data);
+                break;
+            case 'webrtc-answer':
+                setAnswer(data.data);
+                break;
+            case 'webrtc-offer':
+                setOffer(data.data);
+                break;
             default:
                 console.warn('Unknown message type:', data.type);
                 console.warn('Unknown message:', data);
@@ -196,10 +246,13 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
     }
 
     return (
-        <WebSocketContext.Provider value={{ socket, sendMessage, chatMessages, 
-        subscribe_channel, setChatMessages, selectCave,
-         newPermissions, newPresence, reconnecting, newChannel,
-          newCaveRole, roleAssignedToMember, userJoinedCave }}>
+        <WebSocketContext.Provider value={{
+            socket, sendMessage, chatMessages,
+            subscribe_channel, setChatMessages, selectCave,
+            newPermissions, newPresence, reconnecting, newChannel,
+            newCaveRole, roleAssignedToMember, userJoinedCave, 
+            answer, offer, newUserJoinedVoiceChannel, userLeftVoiceChannel
+        }}>
             {children}
         </WebSocketContext.Provider>
     );

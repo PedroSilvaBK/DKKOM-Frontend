@@ -1,4 +1,6 @@
+import { UserPermissionCache } from "../../api/CaveServiceApi";
 import { CavePermissions } from "./CavePermissions";
+import { ChannelPermissions } from "./ChannelPermissions";
 
 class PermissionsService {
 
@@ -7,7 +9,7 @@ class PermissionsService {
     }
 
     private hasPermission(userPermissions: number, permission: number): boolean {
-        if (userPermissions & CavePermissions.OWNER || userPermissions & CavePermissions.ADMIN) {
+        if (userPermissions & CavePermissions.OWNER) {
             return true;
         }
         return (userPermissions & permission) === permission;
@@ -62,8 +64,14 @@ class PermissionsService {
         return this.hasPermission(userPermissions, CavePermissions.CREATE_INVITES);
     }
 
-    public canSendMessage(userPermissions: number): boolean {
-        return this.hasPermission(userPermissions, CavePermissions.SEND_MESSAGES);
+    public canSendMessage(userPermissions: UserPermissionCache, channelId: string): boolean {
+        return this.processChannelPermissionCheck(
+            userPermissions.cavePermissions,
+            userPermissions?.channelPermissionsCacheHashMap === null ? 0 : userPermissions?.channelPermissionsCacheHashMap[channelId]?.allow,
+            userPermissions?.channelPermissionsCacheHashMap === null ? 0 : userPermissions?.channelPermissionsCacheHashMap[channelId]?.deny,
+            CavePermissions.SEND_MESSAGES,
+            ChannelPermissions.SEND_MESSAGES
+        )
     }
 }
 

@@ -240,7 +240,7 @@ function MessagePanel() {
                 }
             </div>
             {
-                selectedCaveBaseInfo && permissionsService.canSendMessage(selectedCaveBaseInfo.userPermissionsCache.cavePermissions) ? (
+                selectedCaveBaseInfo && selectedCaveTextChannelId && permissionsService.canSendMessage(selectedCaveBaseInfo.userPermissionsCache, selectedCaveTextChannelId) ? (
                     <div className='p-3 h-fit w-full'>
                     <div className='bg-primary-200 rounded-xl p-1 gap-2 flex items-center overflow-y-auto max-h-[50vh] '>
                         <div className='ml-2 sticky top-0 h-full'>
