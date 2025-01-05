@@ -28,7 +28,7 @@ pipeline {
                 expression { params.ACTION == 'deploy' }
             }
             steps {
-                sh 'gcloud container clusters get-credentials dcom-cluster --zone europe-west1-b --project d-com-437216'
+                sh 'gcloud container clusters get-credentials dcom-cluster --zone europe-west1-b --project dkkom-446515'
             }
         }
         stage('Build frontend') {
@@ -53,8 +53,8 @@ pipeline {
                 expression { params.ACTION == 'deploy' }
             }
             steps {
-                sh 'docker build -t europe-west1-docker.pkg.dev/d-com-437216/cluster-repo/frontend .'
-                sh 'docker push europe-west1-docker.pkg.dev/d-com-437216/cluster-repo/frontend'
+                sh 'docker build -t europe-west1-docker.pkg.dev/dkkom-446515/cluster-repo/frontend .'
+                sh 'docker push europe-west1-docker.pkg.dev/dkkom-446515/cluster-repo/frontend'
             }
         }
         stage('Deploy') {
