@@ -35,6 +35,8 @@ type WebSocketContextType = {
     newUserJoinedVoiceChannel: UserJoinedVoiceChannel | null;
     userLeftVoiceChannel: UserJoinedVoiceChannel | null;
     candidate: RTCIceCandidate | null;
+    isVoiceConnected: boolean;
+    setIsVoiceConnected: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -63,8 +65,8 @@ type UserJoinedCave = {
 }
 
 type UserJoinedVoiceChannel = {
-    userId: string;
-    roomId: string;
+    user_id: string;
+    room_id: string;
     username: string;
 }
 
@@ -88,6 +90,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
     const [answer, setAnswer] = useState<RTCSessionDescriptionInit | null>(null);
     const [candidate, setCandidate] = useState<RTCIceCandidate | null>(null);
     const [offer, setOffer] = useState<any | null>(null);
+    const [isVoiceConnected, setIsVoiceConnected] = useState<boolean>(false);
 
     const backendUrl = import.meta.env.VITE_BACKEND_WS_URL;
 
@@ -257,7 +260,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
             subscribe_channel, setChatMessages, selectCave,
             newPermissions, newPresence, reconnecting, newChannel,
             newCaveRole, roleAssignedToMember, userJoinedCave, 
-            answer, offer, newUserJoinedVoiceChannel, userLeftVoiceChannel, candidate
+            answer, offer, newUserJoinedVoiceChannel, userLeftVoiceChannel, candidate, isVoiceConnected, setIsVoiceConnected
         }}>
             {children}
         </WebSocketContext.Provider>

@@ -9,6 +9,7 @@ import { UserInChannel } from './VoiceChannelList';
 import UserVoiceChatSettingsMenu from './UserVoiceChatSettingsMenu';
 import { useAuth } from './AuthProvider';
 import VoiceChannelConnectedUsersList from './VoiceChannelConnectedUsersList';
+import { useWebSocket } from './websockets/WebSockets';
 
 function VoiceChannelListItem({ toggleEditVoiceChannelMenu, channelOverview, userPermissionsCache, usersInChannel }: { toggleEditVoiceChannelMenu: (channelOverview: ChannelOverviewDTO) => void, channelOverview: ChannelOverviewDTO, userPermissionsCache: UserPermissionCache, usersInChannel: UserInChannel[] | undefined }) {
     const handleOnClick = () => {
@@ -17,7 +18,8 @@ function VoiceChannelListItem({ toggleEditVoiceChannelMenu, channelOverview, use
         }
     };
 
-    const { connectVoiceChannel, remoteStreams, isVoiceConnected } = useWebRTC();
+    const { connectVoiceChannel, remoteStreams } = useWebRTC();
+    const {isVoiceConnected} = useWebSocket();
     const [volumeLevels, _] = useState<Map<string, number>>(new Map());
     const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
     const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -52,14 +54,17 @@ function VoiceChannelListItem({ toggleEditVoiceChannelMenu, channelOverview, use
 
     return (
         <div>
-            <div className='p-2 flex items-center justify-between group hover:cursor-pointer hover:bg-secondary-300 rounded-xl'>
-                <div className='flex items-center gap-2' onClick={connect}>
+            <div className='p-2 flex items-center justify-between group hover:cursor-pointer hover:bg-secondary-300 rounded-xl' onClick={connect}>
+                <div className='flex items-center gap-2'>
                     <SpatialAudioOffIcon style={{ fontSize: '1.2rem' }} />
                     <h1>{channelOverview.name}</h1>
                 </div>
                 {permissionsService.canManageChannels(userPermissionsCache.cavePermissions) && (
-                    <div className='group-hover:visible invisible'>
-                        <IconButton onClick={handleOnClick}>
+                    <div className='group-hover:visible invisible z-10'>
+                        <IconButton onClick={(e) => {
+                            e.stopPropagation();
+                            handleOnClick();
+                        }}>
                             <SettingsIcon style={{ fontSize: '1.2rem' }} className='text-secondary-100' />
                         </IconButton>
                     </div>

@@ -26,7 +26,8 @@ function MainPanel() {
     const { selectedCaveBaseInfo, setSelectedCaveBaseInfo } = useCave();
     const { newChannel } = useWebSocket();
 
-    const { isVoiceConnected, disconnectVoiceChannel } = useWebRTC();
+    const { disconnectVoiceChannel } = useWebRTC();
+    const { isVoiceConnected } = useWebSocket();
 
     useEffect(() => {
         if (newChannel) {

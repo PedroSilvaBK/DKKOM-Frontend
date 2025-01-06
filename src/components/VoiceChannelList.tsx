@@ -18,8 +18,8 @@ function VoiceChannelList({ toggleEditVoiceChannelMenu, channelsOverview }: { to
   const { selectedCaveBaseInfo } = useCave();
   const {user} = useAuth();
 
-  const { newUserJoinedVoiceChannel, userLeftVoiceChannel } = useWebSocket();
-  const {isVoiceConnected, currentChannelId } = useWebRTC();
+  const { newUserJoinedVoiceChannel, userLeftVoiceChannel, isVoiceConnected } = useWebSocket();
+  const {currentChannelId } = useWebRTC();
 
   const [usersPerChannel, setUsersPerChannel] = useState<Map<string, UserInChannel[]>>(new Map());
 
@@ -43,16 +43,15 @@ function VoiceChannelList({ toggleEditVoiceChannelMenu, channelsOverview }: { to
   }, [channelsOverview]);
   
   useEffect(() => {
-    // add new connected user to the channel
     if (newUserJoinedVoiceChannel) {
       setUsersPerChannel((prev) => {
         const newUsersInChannel = new Map(prev);
-        const users = newUsersInChannel.get(newUserJoinedVoiceChannel.roomId) || [];
+        const users = newUsersInChannel.get(newUserJoinedVoiceChannel.room_id) || [];
         users.push({
           username: newUserJoinedVoiceChannel.username,
-          id: newUserJoinedVoiceChannel.userId,
+          id: newUserJoinedVoiceChannel.user_id,
         });
-        newUsersInChannel.set(newUserJoinedVoiceChannel.roomId, users);
+        newUsersInChannel.set(newUserJoinedVoiceChannel.room_id, users);
         return newUsersInChannel;
       });
     }
@@ -61,7 +60,7 @@ function VoiceChannelList({ toggleEditVoiceChannelMenu, channelsOverview }: { to
 
   useEffect(() => {
     if (userLeftVoiceChannel) {
-      removeUserFromChannelView(userLeftVoiceChannel.roomId, userLeftVoiceChannel.userId);
+      removeUserFromChannelView(userLeftVoiceChannel.room_id, userLeftVoiceChannel.user_id);
     }
   }, [userLeftVoiceChannel]);
 

@@ -18,16 +18,14 @@ type WebRTCContextType = {
     defaultAudioDevice: string;
     defaultVideoDevice: string;
     remoteStreams: Map<string, MediaStream>
-    isVoiceConnected: boolean
     currentChannelId: string
 }
 
 export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
     const { user } = useAuth()
-    const { socket, answer, offer, candidate } = useWebSocket()
+    const { socket, answer, offer, candidate, setIsVoiceConnected } = useWebSocket()
     const pcRef = useRef<RTCPeerConnection | null>(null);
 
-    const [isVoiceConnected, setIsVoiceConnected] = useState<boolean>(false);
 
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
     const remoteStreamsRef = useRef<Map<string, MediaStream>>(new Map());
@@ -94,6 +92,12 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
                         }
                     })
                 );
+            }
+        };
+
+        peer.oniceconnectionstatechange = (event) => {
+            if (peer.iceConnectionState === "connected") {
+                setIsVoiceConnected(true);
             }
         };
 
@@ -200,9 +204,6 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
                         }
                     }));
                 }
-
-                setIsVoiceConnected(true);
-
                 
               } catch (err) {
                 console.error("Error accessing media devices:", err);
@@ -253,7 +254,7 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
     return (
         <WebRTCContext.Provider value={{ connectVoiceChannel, disconnectVoiceChannel, audioDevices, 
         videoDevices, setDefaultAudioDevice, setDefaultVideoDevice, defaultAudioDevice,
-         defaultVideoDevice, remoteStreams: remoteStreamsRef.current, isVoiceConnected, currentChannelId }}>
+         defaultVideoDevice, remoteStreams: remoteStreamsRef.current, currentChannelId }}>
             {children}
         </WebRTCContext.Provider>
     )
