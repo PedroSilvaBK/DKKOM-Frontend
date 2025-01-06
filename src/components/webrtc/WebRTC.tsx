@@ -226,12 +226,15 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
     }
 
     useEffect(() => {
+        console.log("Getting input devices");
         getInputDevices()
     },[])
 
     const getInputDevices = async () => {
-        const devices = await navigator.mediaDevices.enumerateDevices();
+        await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
 
+        const devices = await navigator.mediaDevices.enumerateDevices();        
+        
         const videoDevices = devices.filter((device) => device.kind === "videoinput");
         const audioDevices = devices.filter((device) => device.kind === "audioinput");
 
