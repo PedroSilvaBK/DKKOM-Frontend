@@ -66,8 +66,18 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
 
     const createPeerConnection = (stream: MediaStream, currentChannelId: string): RTCPeerConnection => {
         const configuration: RTCConfiguration = {
-            iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+            iceServers: [
+                // {
+                //     urls: "stun:stun.l.google.com:19302", // STUN server
+                // },
+                {
+                    urls: "turn:35.210.177.27:3478",      // TURN server
+                    username: "username",              // TURN server username
+                    credential: "password",    // TURN server password
+                },
+            ],
         };
+        
         const peer = new RTCPeerConnection(configuration);
 
         pcRef.current = peer;
