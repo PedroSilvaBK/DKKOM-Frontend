@@ -105,7 +105,7 @@ export const WebRTCProvider: React.FC<WebRTCProviderProps> = ({ children }) => {
             }
         };
 
-        peer.oniceconnectionstatechange = (event) => {
+        peer.oniceconnectionstatechange = () => {
             if (peer.iceConnectionState === "connected") {
                 setIsVoiceConnected(true);
             }
