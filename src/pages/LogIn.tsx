@@ -1,11 +1,9 @@
 import { useEffect } from 'react'
 import { AnimationControls, motion, useAnimation } from 'framer-motion'
-import google_logo from '../assets/google_logo.png'
 import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import axios from 'axios';
 import { useAuth } from '../components/AuthProvider';
 import { useNavigate } from 'react-router-dom';
-import { nav } from 'framer-motion/client';
 
 function LogIn() {
     const animationControls: AnimationControls = useAnimation()
