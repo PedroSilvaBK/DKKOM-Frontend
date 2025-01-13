@@ -1,0 +1,12 @@
+replicas: 1
+
+image:
+  repository: europe-west1-docker.pkg.dev/dkkom-446515/cluster-repo/frontend
+  tag: latest
+
+containerPort: 80
+
+service:
+  port: 80
+  targetPort: 80
+  type: ClusterIP

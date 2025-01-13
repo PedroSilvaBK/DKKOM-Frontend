@@ -1,7 +1,7 @@
 pipeline {
     agent any
     parameters {
-        choice(name: 'ACTION', choices: ['normal', 'deploy'], description: 'Choose whether to have normal ci or with deployment')
+        choice(name: 'ACTION', choices: ['normal', 'deploy-prod', 'deploy-staging'], description: 'Choose whether to have normal ci or with deployment')
     }
     environment {
         GOOGLE_APPLICATION_CREDENTIALS = credentials('GCP_KEY') // Use the ID from the stored credentials
@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Authenticate with Google Cloud') {
             when {
-                expression { params.ACTION == 'deploy' }
+                expression { params.ACTION == 'deploy-prod' || params.ACTION == 'deploy-staging' }
             }
             steps {
                 script {
@@ -25,7 +25,7 @@ pipeline {
         }
         stage('Get Cluster Credentials') {
             when {
-                expression { params.ACTION == 'deploy' }
+                expression { params.ACTION == 'deploy-prod' || params.ACTION == 'deploy-staging' }
             }
             steps {
                 sh 'gcloud container clusters get-credentials dcom-cluster --zone europe-west1-b --project dkkom-446515'
@@ -48,22 +48,44 @@ pipeline {
                 sh 'snyk test --all-projects'
             }
         }
-        stage('Dockerize') {
+        stage('Dockerize Production') {
             when {
-                expression { params.ACTION == 'deploy' }
+                expression { params.ACTION == 'deploy-prod' }
             }
             steps {
-                sh 'docker build -t europe-west1-docker.pkg.dev/dkkom-446515/cluster-repo/frontend .'
-                sh 'docker push europe-west1-docker.pkg.dev/dkkom-446515/cluster-repo/frontend'
+                sh 'docker build -f Dockerfile-prod -t europe-west1-docker.pkg.dev/dkkom-446515/cluster-repo/frontend:latest .'
+                sh 'docker push europe-west1-docker.pkg.dev/dkkom-446515/cluster-repo/frontend:latest'
             }
         }
-        stage('Deploy') {
+        stage('Deploy Production') {
             when {
-                expression { params.ACTION == 'deploy' }
+                expression { params.ACTION == 'deploy-prod' }
             }
             steps {
-                sh 'kubectl delete deployment frontend --ignore-not-found=true'
-                sh 'kubectl apply -f frontend-deployment.yaml'
+                sh '''
+                    helm upgrade --install frontend ./frontend-helm \
+                        -f ./frontend-helm/values.yaml
+                    '''
+            }
+        }
+        stage('Dockerize Staging') {
+            when {
+                expression { params.ACTION == 'deploy-staging' }
+            }
+            steps {
+                sh 'docker build -f Dockerfile-staging -t europe-west1-docker.pkg.dev/dkkom-446515/cluster-repo/frontend:staging .'
+                sh 'docker push europe-west1-docker.pkg.dev/dkkom-446515/cluster-repo/frontend:staging'
+            }
+        }
+        stage('Deploy Staging') {
+            when {
+                expression { params.ACTION == 'deploy-staging' }
+            }
+            steps {
+                sh '''
+                    helm upgrade --install frontend-staging ./frontend-helm \
+                        -f ./frontend-helm/values=staging.yaml
+                    '''
             }
         }
     }
