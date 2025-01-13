@@ -84,7 +84,7 @@ pipeline {
             steps {
                 sh '''
                     helm upgrade --install frontend-staging ./frontend-helm \
-                        -f ./frontend-helm/values=staging.yaml
+                        -f ./frontend-helm/values-staging.yaml
                     '''
             }
         }
