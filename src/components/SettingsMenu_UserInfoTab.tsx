@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import UserServiceApi, { User } from '../api/UserServiceApi';
 import { useAuth } from './AuthProvider';
+import MessageServiceApi from '../api/MessageServiceApi';
 
 function SettingsMenu_UserInfoTab() {
     const saveChangesAnimation = useAnimation()
@@ -104,6 +105,33 @@ function SettingsMenu_UserInfoTab() {
         deleteAccount()
     }
 
+    const handleExportAccount = async () => {
+        if (!user?.id) {
+            return;
+        }
+
+        try {
+
+            const blob = await MessageServiceApi.exportMessages(user.id);
+
+            // Create a URL for the Blob and trigger download
+            const fileName = `user_messages_${user.id}.json`;
+            const fileURL = window.URL.createObjectURL(blob);
+
+            const link = document.createElement("a");
+            link.href = fileURL;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Optionally, revoke the object URL after some time
+            setTimeout(() => window.URL.revokeObjectURL(fileURL), 100);
+        } catch (err: any) {
+            console.error(err);
+        }
+    }
+
     return (
         <div className='h-full overflow-hidden relative'>
             <h1 className="text-lg font-bold">User Info</h1>
@@ -131,6 +159,18 @@ function SettingsMenu_UserInfoTab() {
                         )}
                     </div>
                     <div>
+                        <label htmlFor="username" className="text-secondary-100 font-semibold">
+                            Email
+                        </label>
+                        <input
+                            type="text"
+                            name="email"
+                            disabled={true}
+                            value={userInfo?.email}
+                            className={`bg-primary-100 rounded-lg p-2 w-full outline-none`}
+                        />
+                    </div>
+                    <div>
                         <label htmlFor="name" className="text-secondary-100 font-semibold">
                             Name
                         </label>
@@ -149,6 +189,9 @@ function SettingsMenu_UserInfoTab() {
                         {formik.touched.name && formik.errors.name && (
                             <div className="text-red-500 text-sm">{formik.errors.name}</div>
                         )}
+                        <div className='mt-4'>
+                            <button type='button' onClick={handleExportAccount} className='w-full p-2 bg-red-500 rounded-2xl outline-none hover:bg-primary-200 hover:border-1 hover:border-red-500 border-2 border-transparent hover:text-red-500  transition-all ease-all'>Export Messages</button>
+                        </div>
                         <div className='mt-4'>
                             <button type='button' onClick={handleDeleteAccount} className='w-full p-2 bg-red-500 rounded-2xl outline-none hover:bg-primary-200 hover:border-1 hover:border-red-500 border-2 border-transparent hover:text-red-500  transition-all ease-all'>Delete Account</button>
                         </div>
