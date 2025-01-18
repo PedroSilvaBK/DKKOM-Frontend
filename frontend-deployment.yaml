@@ -17,6 +17,10 @@ spec:
         image: europe-west1-docker.pkg.dev/dkkom-446515/cluster-repo/frontend:latest
         ports:
         - containerPort: 80  # The container listens on port 80
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 1000
+          runAsNonRoot: true
 
 ---
 
