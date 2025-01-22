@@ -54,7 +54,7 @@ function VoiceChannelListItem({ toggleEditVoiceChannelMenu, channelOverview, use
 
     return (
         <div>
-            <div className='p-2 flex items-center justify-between group hover:cursor-pointer hover:bg-secondary-300 rounded-xl' onClick={connect}>
+            <div className='p-2 flex items-center justify-between group hover:cursor-pointer hover:bg-primary-500 rounded-xl' onClick={connect}>
                 <div className='flex items-center gap-2'>
                     <SpatialAudioOffIcon style={{ fontSize: '1.2rem' }} />
                     <h1>{channelOverview.name}</h1>

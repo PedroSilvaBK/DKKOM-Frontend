@@ -90,7 +90,7 @@ function CaveCreateChannelMenu({ toggleCreateChannelMenuOpen, createChannel }: {
                                             type="text"
                                             name="channelName"
                                             placeholder="Enter channel name"
-                                            className="w-full text-black p-2 bg-primary-300 rounded-lg"
+                                            className="w-full text-seocndary p-2 bg-primary-300 rounded-lg"
                                         />
                                         <ErrorMessage name="channelName" component="div" className="text-red-500 text-sm" />
                                     </div>

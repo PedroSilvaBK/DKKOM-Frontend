@@ -66,7 +66,7 @@ function CaveInviteMenu({ toggleCreateInviteMenuOpen, createInvite }: { toggleCr
                     <div className='flex flex-col gap-1'>
                         <h3 className='font-semibold'>Or send a invitation link</h3>
                         <div className='flex gap-3'>
-                            <input type="text" placeholder='https://discord.gg/invite' className='w-full p-2 bg-primary-300 rounded-lg text-black' value={inviteLink} />
+                            <input type="text" placeholder='https://discord.gg/invite' className='w-full p-2 bg-primary-300 rounded-lg text-secondary' value={inviteLink} />
                             <button className='bg-primary-100 hover:bg-secondary-300 transition ease-all text-secondary-100 p-2 rounded-lg' onClick={copyInviteToClipboard}>Copy</button>
                         </div>
                         <div>

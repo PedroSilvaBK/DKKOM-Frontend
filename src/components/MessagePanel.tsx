@@ -242,7 +242,7 @@ function MessagePanel() {
             {
                 selectedCaveBaseInfo && selectedCaveTextChannelId && permissionsService.canSendMessage(selectedCaveBaseInfo.userPermissionsCache, selectedCaveTextChannelId) ? (
                     <div className='p-3 h-fit w-full'>
-                    <div className='bg-primary-200 rounded-xl p-1 gap-2 flex items-center overflow-y-auto max-h-[50vh] '>
+                    <div className='bg-primary-300 rounded-xl p-1 gap-2 flex items-center overflow-y-auto max-h-[50vh] '>
                         <div className='ml-2 sticky top-0 h-full'>
                             <AddIcon />
                         </div>
@@ -251,7 +251,7 @@ function MessagePanel() {
                             contentEditable="true"
                             role="textbox"
                             aria-multiline="true"
-                            className="w-full bg-primary-200 text-secondary-100 text-lg p-3 pl-0 outline-none "
+                            className="w-full bg-primary-300 text-secondary-100 text-lg p-3 pl-0 outline-none "
                             style={{
                                 minHeight: '44px',
                                 overflowWrap: 'break-word',

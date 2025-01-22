@@ -82,6 +82,7 @@ interface CreateCaveRoleRequest {
 
 interface CreateCaveRoleResponse {
     id: string;
+    caveId: string;
     name: string;
     position: number;
     permissions: number;

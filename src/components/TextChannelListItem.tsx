@@ -21,7 +21,7 @@ function TextChannelListItem({ toggleEditTextChannelMenu, channelOverview, setSe
     }
 
     return (
-        <div onClick={handleOnClickChannel} className={`${selectedCaveTextChannelId === channelOverview?.id ? "bg-secondary-300" : ""} group hover:cursor-pointer hover:bg-secondary-300 rounded-xl`}>
+        <div onClick={handleOnClickChannel} className={`${selectedCaveTextChannelId === channelOverview?.id ? "bg-primary-400" : ""} group hover:cursor-pointer hover:bg-primary-500 rounded-xl`}>
             <div className='p-2 flex items-center justify-between'>
                 <div className='flex items-center gap-2'>
                     <TagIcon style={{ fontSize: '1.2rem' }} />
